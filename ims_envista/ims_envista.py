@@ -72,7 +72,7 @@ class IMSEnvista:
         """
         logger.debug(f"Fetching data from: {url}")
         try:
-            response = session.get(
+            response = self.session.get(
                 url,
                 headers={
                     "Accept": "application/vnd.github.v3.text-match+json",
