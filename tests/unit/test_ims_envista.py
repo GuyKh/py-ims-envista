@@ -105,7 +105,8 @@ class TestIMSEnvista(unittest.TestCase):
         self.assertIsNotNone(station_data.data)
         self.assertGreater(len(station_data.data), 0)
         for station_reading in station_data.data:
-yesterday = today - timedelta(days=1)            self.assertEqual(station_reading.datetime.date(), date.today())
+            yesterday = today - timedelta(days=1)
+            self.assertEqual(station_reading.datetime.date(), date.today())
 
     def test_get_station_data_by_date_range(self):
         today = date.today()
