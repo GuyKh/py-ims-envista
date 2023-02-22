@@ -7,7 +7,7 @@ from tests import *
 
 def to_date_time(d: date) -> datetime:
     """Convert date to datetime"""
-    return datetime(d.year, d.month, d.day).astimezone(timezone.utc)
+    return datetime(d.year, d.month, d.day).astimezone()
 
 
 class TestIMSEnvista(unittest.TestCase):
@@ -17,6 +17,9 @@ class TestIMSEnvista(unittest.TestCase):
         self.station_id = 178  # TEL AVIV COAST station
         self.region_id = 13
         self.channel_id = 7  # TD = Temperature Channel
+
+    def tearDown(self):
+        self.ims.close()
 
     def test_get_all_regions_info(self):
         regions = self.ims.get_all_regions_info()
@@ -104,7 +107,6 @@ class TestIMSEnvista(unittest.TestCase):
         self.assertIsNotNone(station_data.data)
         self.assertGreater(len(station_data.data), 0)
         for station_reading in station_data.data:
-            yesterday = today - timedelta(days=1)
             self.assertEqual(station_reading.datetime.date(), date.today())
 
     def test_get_station_data_by_date_range(self):
@@ -119,8 +121,8 @@ class TestIMSEnvista(unittest.TestCase):
         self.assertIsNotNone(station_data.data)
         self.assertGreater(len(station_data.data), 0)
         for station_reading in station_data.data:
-            self.assertGreaterEqual(station_reading.datetime.astimezone(timezone.utc), to_date_time(yesterday))
-            self.assertLess(station_reading.datetime.astimezone(timezone.utc), to_date_time(today))
+            self.assertGreaterEqual(station_reading.datetime, to_date_time(yesterday))
+            self.assertLess(station_reading.datetime, to_date_time(today))
             self.assertGreater(station_reading.td, 0)
 
     def test_get_station_data_by_date_range_with_channel(self):
@@ -138,8 +140,8 @@ class TestIMSEnvista(unittest.TestCase):
         self.assertIsNotNone(station_data.data)
         self.assertGreater(len(station_data.data), 0)
         for station_reading in station_data.data:
-            self.assertGreaterEqual(station_reading.datetime.astimezone(timezone.utc), to_date_time(yesterday))
-            self.assertLess(station_reading.datetime.astimezone(timezone.utc), to_date_time(today))
+            self.assertGreaterEqual(station_reading.datetime, to_date_time(yesterday))
+            self.assertLess(station_reading.datetime, to_date_time(today))
             self.assertGreater(station_reading.td, 0)
 
     def test_get_monthly_station_data(self):
