@@ -18,6 +18,9 @@ class TestIMSEnvista(unittest.TestCase):
         self.region_id = 13
         self.channel_id = 7  # TD = Temperature Channel
 
+    def tearDown(self):
+        self.ims.close()
+
     def test_get_all_regions_info(self):
         regions = self.ims.get_all_regions_info()
 

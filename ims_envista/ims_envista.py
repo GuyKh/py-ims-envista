@@ -92,6 +92,9 @@ class IMSEnvista:
             logger.error(f"Other error occurred: {err}")  # Python 3.6
             return None
 
+    def close(self):
+        self.session.close()
+
     def get_latest_station_data(
         self, station_id: int, channel_id: int = None
     ) -> StationMeteorologicalReadings:
