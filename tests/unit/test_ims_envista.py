@@ -1,6 +1,5 @@
 from datetime import date, datetime, timedelta
 import os
-import pytz
 from ims_envista import IMSEnvista
 
 from tests import *
@@ -8,7 +7,7 @@ from tests import *
 
 def to_date_time(d: date) -> datetime:
     """Convert date to datetime"""
-    return datetime(d.year, d.month, d.day).astimezone(pytz.timezone('Asia/Jerusalem'))
+    return datetime(d.year, d.month, d.day).astimezone(timezone.utc)
 
 
 class TestIMSEnvista(unittest.TestCase):
@@ -120,8 +119,8 @@ class TestIMSEnvista(unittest.TestCase):
         self.assertIsNotNone(station_data.data)
         self.assertGreater(len(station_data.data), 0)
         for station_reading in station_data.data:
-            self.assertGreaterEqual(station_reading.datetime, to_date_time(yesterday))
-            self.assertLess(station_reading.datetime, to_date_time(today))
+            self.assertGreaterEqual(station_reading.datetime.astimezone(timezone.utc), to_date_time(yesterday))
+            self.assertLess(station_reading.datetime.astimezone(timezone.utc), to_date_time(today))
             self.assertGreater(station_reading.td, 0)
 
     def test_get_station_data_by_date_range_with_channel(self):
@@ -139,8 +138,8 @@ class TestIMSEnvista(unittest.TestCase):
         self.assertIsNotNone(station_data.data)
         self.assertGreater(len(station_data.data), 0)
         for station_reading in station_data.data:
-            self.assertGreaterEqual(station_reading.datetime, to_date_time(yesterday))
-            self.assertLess(station_reading.datetime, to_date_time(today))
+            self.assertGreaterEqual(station_reading.datetime.astimezone(timezone.utc), to_date_time(yesterday))
+            self.assertLess(station_reading.datetime.astimezone(timezone.utc), to_date_time(today))
             self.assertGreater(station_reading.td, 0)
 
     def test_get_monthly_station_data(self):
