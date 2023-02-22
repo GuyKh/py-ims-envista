@@ -110,7 +110,7 @@ class TestIMSEnvista(unittest.TestCase):
             self.assertEqual(station_reading.datetime.date(), date.today())
 
     def test_get_station_data_by_date_range(self):
-        today = date.today().astimezone(timezone.utc)
+        today = datetime.now().astimezone(timezone.utc).date()
         yesterday = today - timedelta(days=1)
         station_data = self.ims.get_station_data_by_date_range(
             self.station_id, from_date=yesterday, to_date=today
@@ -126,7 +126,7 @@ class TestIMSEnvista(unittest.TestCase):
             self.assertGreater(station_reading.td, 0)
 
     def test_get_station_data_by_date_range_with_channel(self):
-        today = date.today().astimezone(timezone.utc)
+        today = datetime.now().astimezone(timezone.utc).date()
         yesterday = today - timedelta(days=1)
         station_data = self.ims.get_station_data_by_date_range(
             self.station_id,
