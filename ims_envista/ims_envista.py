@@ -4,9 +4,10 @@ from typing import Optional
 
 from datetime import datetime, date
 import requests
+from requests.adapters import HTTPAdapter
 from requests.exceptions import HTTPError
 from loguru import logger
-
+from urllib3 import Retry
 
 from .const import (
     GET_LATEST_STATION_DATA_URL,
@@ -35,6 +36,13 @@ from .station_data import StationInfo, station_from_json, region_from_json, Regi
 # and wait for timeout before trying ipv4, so we have to disable ipv6
 requests.packages.urllib3.util.connection.HAS_IPV6 = False
 
+def createSession():
+    session = requests.Session()
+    retry = Retry(connect=3, backoff_factor=0.5)
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+
 
 class IMSEnvista:
     """API Wrapper to IMS Envista"""
@@ -44,6 +52,7 @@ class IMSEnvista:
             raise ValueError
 
         self.token = token
+        self.session = createSession()
 
     @staticmethod
     def _get_channel_id_url_part(channel_id: int) -> str:
@@ -63,7 +72,7 @@ class IMSEnvista:
         """
         logger.debug(f"Fetching data from: {url}")
         try:
-            response = requests.get(
+            response = session.get(
                 url,
                 headers={
                     "Accept": "application/vnd.github.v3.text-match+json",
