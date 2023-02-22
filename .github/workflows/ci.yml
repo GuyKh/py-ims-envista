@@ -40,16 +40,16 @@ jobs:
     - name: Install Python dependencies
       uses: py-actions/py-dependency-install@v4
 
+    - name: Update version in setup.py
+      run: >-
+        sed -i "s/{{VERSION_PLACEHOLDER}}/0.0.1/g" setup.py
+
     - name: Build
       run: >-
         python setup.py install
 
     - name: Set IMS token
       run: export IMS_TOKEN=${{secrets.IMS_TOKEN}}
-
-    - name: Update version in setup.py
-      run: >-
-        sed -i "s/{{VERSION_PLACEHOLDER}}/0.0.1/g" setup.py
 
     # Tests with unittest
     - name: Run UnitTests
