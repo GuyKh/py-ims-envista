@@ -19,6 +19,9 @@ pip3 install --upgrade ims-envista
 
 weatheril can be configured to retrive forecast information for specific location. when initiating the library you must set the location id and language (Currently only he and en are supported)
 
+### Getting an IMS Token
+You can read about the API and about how to get a token [here](https://ims.gov.il/en/ObservationDataAPI) - signing terms of use, etc.
+
 ```python
 from ims_envista import IMSEnvista
 
