@@ -7,7 +7,7 @@ from tests import *
 
 def to_date_time(d: date) -> datetime:
     """Convert date to datetime"""
-    return datetime(d.year, d.month, d.day)
+    return datetime(d.year, d.month, d.day).astimezone()
 
 
 class TestIMSEnvista(unittest.TestCase):
