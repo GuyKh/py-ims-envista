@@ -24,6 +24,7 @@ from .const import (
     GET_MONTHLY_STATION_DATA_URL,
     GET_MONTHLY_STATION_DATA_BY_MONTH_URL,
     GET_STATION_DATA_BY_RANGE_URL,
+    VARIABLES
 )
 from .meteo_data import (
     MeteorologicalData,
@@ -284,3 +285,6 @@ class IMSEnvista:
         get_url = GET_SPECIFIC_REGION_DATA_URL.format(str(region_id))
         response = self._get_ims_url(get_url)
         return region_from_json(response)
+
+    def get_metric_descriptions(self) -> list[str]:
+        return VARIABLES
