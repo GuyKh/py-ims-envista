@@ -176,7 +176,7 @@ class TestIMSEnvista(unittest.TestCase):
             self.assertEqual(station_reading.datetime.date().strftime("%Y"), year)
             self.assertGreater(station_reading.td, 0)
 
-    def get_metric_descriptions(self):
+    def test_get_metric_descriptions(self):
         metrics = self.ims.get_metric_descriptions()
 
         self.assertIsNotNone(metrics)
