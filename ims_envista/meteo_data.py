@@ -1,5 +1,8 @@
 import textwrap
+from typing import List
+from dataclasses import dataclass, field
 from datetime import datetime
+
 
 from .const import (
     API_RAIN,
@@ -25,53 +28,37 @@ from .const import (
     API_DATA,
 )
 
-
+@dataclass
 class MeteorologicalData:
-    def __init__(
-        self,
-        station_id: int,
-        dt: datetime,
-        rain: float,
-        ws_max: float,
-        wd_max: float,
-        ws: float,
-        wd: float,
-        std_wd: float,
-        td: float,
-        rh: float,
-        td_max: float,
-        td_min: float,
-        ws_1mm: float,
-        ws_10mm: float,
-    ):
-        self.station_id = station_id
-        """Station ID"""
-        self.datetime = dt
-        """Date and time of the data"""
-        self.rain = rain
-        """Rainfall in mm"""
-        self.ws = ws
-        """Wind speed in m/s"""
-        self.ws_max = ws_max
-        """Gust wind speed in m/s"""
-        self.wd = wd
-        """Wind direction in deg"""
-        self.wd_max = wd_max
-        """Gust wind direction in deg"""
-        self.std_wd = std_wd
-        """Standard deviation wind direction in deg"""
-        self.td = td
-        """Temperature in °C"""
-        self.td_max = td_max
-        """Maximum Temperature in °C"""
-        self.td_min = td_min
-        """Minimum Temperature in °C"""
-        self.rh = rh
-        """Relative humidity in %"""
-        self.ws_1mm = ws_1mm
-        """Maximum 1 minute wind speed in m/s"""
-        self.ws_10mm = ws_10mm
-        """Maximum 10 minute wind speed in m/s"""
+    station_id: int
+    """Station ID"""
+    datetime: datetime
+    """Date and time of the data"""
+    rain: float
+    """Rainfall in mm"""
+    ws: float
+    """Wind speed in m/s"""
+    ws_max: float
+    """Gust wind speed in m/s"""
+    wd: float
+    """Wind direction in deg"""
+    wd_max: float
+    """Gust wind direction in deg"""
+    std_wd: float
+    """Standard deviation wind direction in deg"""
+    td: float
+    """Temperature in °C"""
+    td_max: float
+    """Maximum Temperature in °C"""
+    td_min: float
+    """Minimum Temperature in °C"""
+    rh: float
+    """Relative humidity in %"""
+    ws_1mm: float
+    """Maximum 1 minute wind speed in m/s"""
+    ws_10mm: float
+    """Maximum 10 minute wind speed in m/s"""
+        
 
     def _pretty_print(self) -> str:
         return textwrap.dedent(
@@ -113,12 +100,12 @@ class MeteorologicalData:
         return self._pretty_print().replace("\n", " ")
 
 
+@dataclass
 class StationMeteorologicalReadings:
-    def __init__(self, station_id: int, data: list[MeteorologicalData] = []):
-        self.station_id = station_id
-        """ Station Id"""
-        self.data = data
-        """ List of Meteorological Data """
+    station_id: int
+    """ Station Id"""
+    data: List['MeteorologicalData'] = field(default_factory=list)
+    """ List of Meteorological Data """
 
     def __repr__(self) -> str:
         return textwrap.dedent("""Station ({}), Data: {}""").format(
