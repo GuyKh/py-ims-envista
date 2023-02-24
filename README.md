@@ -75,6 +75,7 @@ ims.get_latest_station_data(23)
 | get_station_data  | Get Station Info by station_id  | station_id: int  | [Station](./ims_envista/station_data.py)  |
 | get_all_regions_data  | Get Region Info of all regions  |   | list[[Region](./ims_envista/station_data.py)]  |
 | get_region_info  | Get Region Info by region_id  | station_id: int  | [Region](./ims_envista/station_data.py)  |
+| get_metric_descriptions  | Get Station Measurements Description  |   | list[IMSVariable](./ims_envista/ims_variable.py)  |
 
 ## Local Development
 

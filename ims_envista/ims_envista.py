@@ -286,5 +286,11 @@ class IMSEnvista:
         response = self._get_ims_url(get_url)
         return region_from_json(response)
 
-    def get_metric_descriptions(self) -> list[str]:
-        return VARIABLES
+    def get_metrics_descriptions(self) -> list[IMSVariable]:
+        """Returns the descriptions of Meteorological Metrics collected by the stations.
+
+        Returns:
+            list of IMSVariable, containing description and measuring unit
+            
+        """
+        return list(VARIABLES.values())

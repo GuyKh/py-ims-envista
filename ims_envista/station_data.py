@@ -1,12 +1,14 @@
 import textwrap
+from typing import List
+from dataclasses import dataclass, field
 
 
+@dataclass
 class Location:
-    def __init__(self, latitude: float, longitude: float):
-        self.latitude = latitude
-        """Latitude"""
-        self.longitude = longitude
-        """Longitude"""
+    latitude: float
+    """Latitude"""
+    longitude: float
+    """Longitude"""
 
     def __repr__(self):
         return textwrap.dedent("""[Lat-{}/Long-{}]""").format(
@@ -18,36 +20,24 @@ def location_from_json(json: dict) -> Location:
     """Converts a JSON object to a Location object."""
     return Location(json["latitude"], json["longitude"])
 
-
+dataclass
 class Monitor:
-    def __init__(
-        self,
-        channel_id: int,
-        name: str,
-        alias: str,
-        active: bool,
-        type_id: int,
-        pollutant_id: int,
-        units: str,
-        description: str,
-    ):
-        self.channel_id = channel_id
-        """Channel ID"""
-        self.name = name
-        """Monitored Condition Name"""
-        self.alias = alias
-        """Monitored Condition Alias"""
-        self.active = active
-        """Is the monitored condition active"""
-        self.type_id = type_id
-        """Monitored Condition Type ID"""
-        self.pollutant_id = pollutant_id
-        """Monitored Condition Pollutant ID"""
-        self.units = units
-        """Monitored Condition Units"""
-        self.description = description
-        """Monitored Condition Description"""
-
+    channel_id: int
+    """Channel ID"""
+    name: str
+    """Monitored Condition Name"""
+    alias: str
+    """Monitored Condition Alias"""
+    active: bool
+    """Is the monitored condition active"""
+    type_id: int
+    """Monitored Condition Type ID"""
+    pollutant_id: int
+    """Monitored Condition Pollutant ID"""
+    units: str
+    """Monitored Condition Units"""
+    description: str
+    """Monitored Condition Description"""
     def __repr__(self):
         return textwrap.dedent("""{}({})""").format(self.name, self.units)
 
@@ -65,44 +55,30 @@ def monitor_from_json(json: dict) -> Monitor:
         json["description"],
     )
 
-
+@dataclass
 class StationInfo:
-    def __init__(
-        self,
-        station_id: int,
-        name: str,
-        short_name: str,
-        stations_tag: str,
-        location: Location,
-        timebase: int,
-        active: bool,
-        owner: str,
-        region_id: int,
-        monitors: list[Monitor],
-        station_target: str,
-    ):
-        self.station_id = station_id
-        """Station ID"""
-        self.name = name
-        """Station name"""
-        self.short_name = short_name
-        """Station short name"""
-        self.stations_tag = stations_tag
-        """Station tags"""
-        self.location = location
-        """Station Location (Lat/Long)"""
-        self.timebase = timebase
-        """Timebase"""
-        self.active = active
-        """Is the station Active"""
-        self.owner = owner
-        """Station owner"""
-        self.region_id = region_id
-        """Region ID"""
-        self.monitors = monitors
-        """List of Monitored Conditions"""
-        self.station_target = station_target
-        """Station Target"""
+    station_id: int
+    """Station ID"""
+    name: str
+    """Station name"""
+    short_name: str
+    """Station short name"""
+    stations_tag: str
+    """Station tags"""
+    location: Location
+    """Station Location (Lat/Long)"""
+    timebase: int
+    """Timebase"""
+    active: bool
+    """Is the station Active"""
+    owner: str
+    """Station owner"""
+    region_id: int
+    """Region ID"""
+    monitors: List['Monitor'] = field(default_factory=list)
+    """List of Monitored Conditions"""
+    station_target: str
+    """Station Target"""
 
     def __repr__(self):
         return textwrap.dedent(
@@ -135,17 +111,14 @@ def station_from_json(json: dict) -> StationInfo:
         json["StationTarget"],
     )
 
-
+@dataclass
 class RegionInfo:
-    def __init__(
-        self, region_id: int, name: str, stations: list[StationInfo] = []
-    ) -> None:
-        self.region_id = region_id
-        """Region ID"""
-        self.name = name
-        """Region Name"""
-        self.stations = stations
-        """List of Stations in the Region"""
+    region_id: int
+    """Region ID"""
+    name: str
+    """Region Name"""
+    stations: List['StationInfo'] = field(default_factory=list)
+    """List of Stations in the Region"""
 
     def __repr__(self):
         return textwrap.dedent("""{}({}), Stations: {}""").format(
