@@ -104,7 +104,7 @@ class MeteorologicalData:
 class StationMeteorologicalReadings:
     station_id: int
     """ Station Id"""
-    data: : List['MeteorologicalData'] = field(default_factory=list)
+    data: List['MeteorologicalData'] = field(default_factory=list)
     """ List of Meteorological Data """
 
     def __repr__(self) -> str:
