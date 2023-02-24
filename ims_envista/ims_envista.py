@@ -26,6 +26,7 @@ from .const import (
     GET_STATION_DATA_BY_RANGE_URL,
     VARIABLES
 )
+from .ims_variable import IMSVariable
 from .meteo_data import (
     MeteorologicalData,
     station_meteo_data_from_json,
