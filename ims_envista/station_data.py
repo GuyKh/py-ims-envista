@@ -75,10 +75,10 @@ class StationInfo:
     """Station owner"""
     region_id: int
     """Region ID"""
-    monitors: List['Monitor'] = field(default_factory=list)
-    """List of Monitored Conditions"""
     station_target: str
     """Station Target"""
+    monitors: List['Monitor'] = field(default_factory=list)
+    """List of Monitored Conditions"""
 
     def __repr__(self):
         return textwrap.dedent(
