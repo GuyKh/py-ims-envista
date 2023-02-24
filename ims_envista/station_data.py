@@ -20,7 +20,7 @@ def location_from_json(json: dict) -> Location:
     """Converts a JSON object to a Location object."""
     return Location(json["latitude"], json["longitude"])
 
-dataclass
+@dataclass
 class Monitor:
     channel_id: int
     """Channel ID"""
