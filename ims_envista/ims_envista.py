@@ -1,6 +1,7 @@
 """Module IMSEnvista getting IMS meteorological readings."""
+from __future__ import annotations
 import json
-from typing import Optional
+from typing import Optional, List
 
 from datetime import datetime, date
 import requests
@@ -230,7 +231,7 @@ class IMSEnvista:
             )
         return station_meteo_data_from_json(self._get_ims_url(get_url))
 
-    def get_all_stations_info(self) -> list[StationInfo]:
+    def get_all_stations_info(self) -> List[StationInfo]:
         """Fetches all stations data from IMS Envista API
 
         Returns:
@@ -255,7 +256,7 @@ class IMSEnvista:
         get_url = GET_SPECIFIC_STATION_DATA_URL.format(str(station_id))
         return station_from_json(self._get_ims_url(get_url))
 
-    def get_all_regions_info(self) -> list[RegionInfo]:
+    def get_all_regions_info(self) -> List[RegionInfo]:
         """Fetches all regions data from IMS Envista API
 
         Returns:
@@ -287,7 +288,7 @@ class IMSEnvista:
         response = self._get_ims_url(get_url)
         return region_from_json(response)
 
-    def get_metrics_descriptions(self) -> list[IMSVariable]:
+    def get_metrics_descriptions(self) -> List[IMSVariable]:
         """Returns the descriptions of Meteorological Metrics collected by the stations.
 
         Returns:

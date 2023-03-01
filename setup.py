@@ -2,7 +2,7 @@ import setuptools
 from ims_envista.version import Version
 
 setuptools.setup(name='ims_envista',
-                 version='{{VERSION_PLACEHOLDER}}',
+                 version='0.0.1',
                  long_description_content_type="text/markdown",
                  description='Israel Meteorological Service Envista API wrapper package',
                  long_description=open('README.md').read().strip(),
