@@ -15,7 +15,7 @@
 * Get measurement data by region, station and date range.
 * Get Daily and Monthly readings by measurement station.
 
-## Components and Frameworks used in weatheril
+## Components and Frameworks used
 
 * [Loguru](https://pypi.org/project/loguru/)
 * [Requests ](https://pypi.org/project/requests/)
