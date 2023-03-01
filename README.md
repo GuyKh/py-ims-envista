@@ -6,6 +6,12 @@
 [![CodeQuality](https://scrutinizer-ci.com/g/GuyKh/py-ims-envista/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/GuyKh/py-ims-envista?b=main)
 [![DownloadFormats](https://img.shields.io/pypi/format/ims-envista)](https://img.shields.io/pypi/format/ims-envista) 
 
+[![Pypi](https://img.shields.io/pypi/v/ims-envista.svg)](https://pypi.python.org/pypi/ims-envista)
+[![Downloads](https://static.pepy.tech/badge/ims-envista)](https://pepy.tech/project/py-ims-envista) 
+[![CI](https://github.com/GuyKh/py-ims-envista/actions/workflows/ci.yml/badge.svg)](https://github.com/GuyKh/pi-ims-envista/actions)
+[![CodeQuality](https://scrutinizer-ci.com/g/GuyKh/py-ims-envista/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/GuyKh/py-ims-envista?b=main)
+[![DownloadFormats](https://img.shields.io/pypi/format/ims-envista)](https://img.shields.io/pypi/format/ims-envista) 
+
 *ims_envista*  is an unofficial IMS (Israel Meteorological Service) python API wrapper for Envista service.
 
 ## Features supported
@@ -14,7 +20,7 @@
 * Get measurement data by region, station and date range.
 * Get Daily and Monthly readings by measurement station.
 
-## Components and Frameworks used in weatheril
+## Components and Frameworks used
 
 * [Loguru](https://pypi.org/project/loguru/)
 * [Requests ](https://pypi.org/project/requests/)
