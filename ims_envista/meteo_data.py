@@ -1,3 +1,4 @@
+from __future__ import annotations
 import textwrap
 from typing import List
 from dataclasses import dataclass, field
