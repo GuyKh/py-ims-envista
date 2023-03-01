@@ -1,3 +1,5 @@
+""" Constant for ims-envista """
+
 from .ims_variable import IMSVariable
 
 ENVISTA_STATIONS_URL = "https://api.ims.gov.il/v1/envista/stations"

@@ -1,3 +1,5 @@
+""" Data Class for IMS Meteorological Readings """
+
 from __future__ import annotations
 import textwrap
 from typing import List
@@ -31,6 +33,7 @@ from .const import (
 
 @dataclass
 class MeteorologicalData:
+    """Meteorological Data"""
     station_id: int
     """Station ID"""
     datetime: datetime
