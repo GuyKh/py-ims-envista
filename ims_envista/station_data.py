@@ -1,3 +1,5 @@
+""" Data Class for Station Data """
+
 from __future__ import annotations
 import textwrap
 from typing import List
@@ -6,6 +8,7 @@ from dataclasses import dataclass, field
 
 @dataclass
 class Location:
+    """Location (Lat/Long)"""
     latitude: float
     """Latitude"""
     longitude: float
@@ -23,6 +26,7 @@ def location_from_json(json: dict) -> Location:
 
 @dataclass
 class Monitor:
+    """Monitor"""
     channel_id: int
     """Channel ID"""
     name: str
@@ -58,6 +62,7 @@ def monitor_from_json(json: dict) -> Monitor:
 
 @dataclass
 class StationInfo:
+    """Station Information"""
     station_id: int
     """Station ID"""
     name: str
@@ -114,6 +119,7 @@ def station_from_json(json: dict) -> StationInfo:
 
 @dataclass
 class RegionInfo:
+    """Region Information"""
     region_id: int
     """Region ID"""
     name: str

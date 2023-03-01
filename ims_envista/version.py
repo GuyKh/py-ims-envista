@@ -1,3 +1,4 @@
+"""Version"""
 class Version(object):
     """Version of the package"""
 

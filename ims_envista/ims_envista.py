@@ -1,9 +1,10 @@
 """Module IMSEnvista getting IMS meteorological readings."""
+
 from __future__ import annotations
 import json
 from typing import Optional, List
 
-from datetime import datetime, date
+from datetime import date
 import requests
 from requests.adapters import HTTPAdapter
 from requests.exceptions import HTTPError
@@ -29,7 +30,6 @@ from .const import (
 )
 from .ims_variable import IMSVariable
 from .meteo_data import (
-    MeteorologicalData,
     station_meteo_data_from_json,
     StationMeteorologicalReadings,
 )
@@ -39,7 +39,7 @@ from .station_data import StationInfo, station_from_json, region_from_json, Regi
 # and wait for timeout before trying ipv4, so we have to disable ipv6
 requests.packages.urllib3.util.connection.HAS_IPV6 = False
 
-def createSession():
+def create_session():
     session = requests.Session()
     retry = Retry(connect=3, backoff_factor=0.5)
     adapter = HTTPAdapter(max_retries=retry)
@@ -56,7 +56,7 @@ class IMSEnvista:
             raise ValueError
 
         self.token = token
-        self.session = createSession()
+        self.session = create_session()
 
     @staticmethod
     def _get_channel_id_url_part(channel_id: int) -> str:
@@ -96,11 +96,12 @@ class IMSEnvista:
             return None
 
     def close(self):
+        """ Close Requests Session """
         self.session.close()
 
     def get_latest_station_data(
-        self, station_id: int, channel_id: int = None
-    ) -> StationMeteorologicalReadings:
+            self, station_id: int, channel_id: int = None
+        ) -> StationMeteorologicalReadings:
         """Fetches the latest station data from IMS Envista API
 
         Args:
@@ -116,8 +117,8 @@ class IMSEnvista:
         return station_meteo_data_from_json(self._get_ims_url(get_url))
 
     def get_earliest_station_data(
-        self, station_id: int, channel_id: int = None
-    ) -> StationMeteorologicalReadings:
+            self, station_id: int, channel_id: int = None
+        ) -> StationMeteorologicalReadings:
         """Fetches the earliest station data from IMS Envista API
 
         Args:
@@ -133,13 +134,13 @@ class IMSEnvista:
         return station_meteo_data_from_json(self._get_ims_url(get_url))
 
     def get_station_data_from_date(
-        self, station_id: int, date_to_query: date, channel_id: int = None
-    ) -> StationMeteorologicalReadings:
+            self, station_id: int, date_to_query: date, channel_id: int = None
+        ) -> StationMeteorologicalReadings:
         """Fetches latest station data from IMS Envista API by date
 
         Args:
             station_id (int): IMS Station ID
-            date_to_query (datetime): Selected date to query
+            date_to_query (date): Selected date to query
             channel_id (int): [Optional] Specific Channel Id
 
         Returns:
@@ -155,18 +156,18 @@ class IMSEnvista:
         return station_meteo_data_from_json(self._get_ims_url(get_url))
 
     def get_station_data_by_date_range(
-        self,
-        station_id: int,
-        from_date: date,
-        to_date: date,
-        channel_id: int = None,
-    ) -> StationMeteorologicalReadings:
+            self,
+            station_id: int,
+            from_date: date,
+            to_date: date,
+            channel_id: int = None,
+        ) -> StationMeteorologicalReadings:
         """Fetches latest station data from IMS Envista API by date range
 
         Args:
             station_id (int): IMS Station ID
-            from_date (datetime): From date to query
-            to_date (datetime): to date to query
+            from_date (date): From date to query
+            to_date (date): to date to query
             channel_id (int): [Optional] Specific Channel Id
 
         Returns:
@@ -185,8 +186,8 @@ class IMSEnvista:
         return station_meteo_data_from_json(self._get_ims_url(get_url))
 
     def get_daily_station_data(
-        self, station_id: int, channel_id: int = None
-    ) -> StationMeteorologicalReadings:
+            self, station_id: int, channel_id: int = None
+        ) -> StationMeteorologicalReadings:
         """Fetches the daily station data from IMS Envista API
 
         Args:
@@ -203,12 +204,12 @@ class IMSEnvista:
         return station_meteo_data_from_json(self._get_ims_url(get_url))
 
     def get_monthly_station_data(
-        self,
-        station_id: int,
-        channel_id: int = None,
-        month: str = None,
-        year: str = None,
-    ) -> StationMeteorologicalReadings:
+            self,
+            station_id: int,
+            channel_id: int = None,
+            month: str = None,
+            year: str = None,
+        ) -> StationMeteorologicalReadings:
         """Fetches monthly station data from IMS Envista API
 
         Args:
@@ -293,6 +294,5 @@ class IMSEnvista:
 
         Returns:
             list of IMSVariable, containing description and measuring unit
-            
         """
         return list(VARIABLES.values())
