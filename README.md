@@ -1,6 +1,12 @@
 # IMS Envista
 ==========================
 
+[![Pypi](https://img.shields.io/pypi/v/ims-envista.svg)](https://pypi.python.org/pypi/ims-envista)
+[![Downloads](https://static.pepy.tech/badge/ims-envista)](https://pepy.tech/project/py-ims-envista) 
+[![CI](https://github.com/GuyKh/py-ims-envista/actions/workflows/ci.yml/badge.svg)](https://github.com/GuyKh/pi-ims-envista/actions)
+[![CodeQuality](https://scrutinizer-ci.com/g/GuyKh/py-ims-envista/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/GuyKh/py-ims-envista?b=main)
+[![DownloadFormats](https://img.shields.io/pypi/format/ims-envista)](https://img.shields.io/pypi/format/ims-envista) 
+
 *ims_envista*  is an unofficial IMS (Israel Meteorological Service) python API wrapper for Envista service.
 
 ## Features supported
@@ -8,6 +14,12 @@
 * Get latest meteorological readings from IMS Envista
 * Get measurement data by region, station and date range.
 * Get Daily and Monthly readings by measurement station.
+
+## Components and Frameworks used
+
+* [Loguru](https://pypi.org/project/loguru/)
+* [Requests ](https://pypi.org/project/requests/)
+* [urllib3](https://pypi.org/project/urllib3/)
 
 ## Installing
 
@@ -75,7 +87,7 @@ ims.get_latest_station_data(23)
 | get_station_data  | Get Station Info by station_id  | station_id: int  | [Station](./ims_envista/station_data.py)  |
 | get_all_regions_data  | Get Region Info of all regions  |   | list[[Region](./ims_envista/station_data.py)]  |
 | get_region_info  | Get Region Info by region_id  | station_id: int  | [Region](./ims_envista/station_data.py)  |
-| get_metric_descriptions  | Get Station Measurements Description  |   | list[[IMSVariable]](./ims_envista/ims_variable.py)  |
+| get_metric_descriptions  | Get Station Measurements Description  |   | list[IMSVariable](./ims_envista/ims_variable.py)  |
 
 ## Local Development
 
