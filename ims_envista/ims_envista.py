@@ -295,4 +295,4 @@ class IMSEnvista:
             list of IMSVariable, containing description and measuring unit
             
         """
-        return List(VARIABLES.values())
+        return list(VARIABLES.values())
