@@ -7,9 +7,6 @@ name = "pypi"
 pytest = "*"
 pytest-cov = "*"
 requests = "*"
-pillow = "*"
-pandas = "*"
-urllib3 = "*"
 loguru = "*"
 
 [dev-packages]
