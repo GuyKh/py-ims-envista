@@ -9,6 +9,7 @@ import requests
 from requests.adapters import HTTPAdapter
 from requests.exceptions import HTTPError
 from loguru import logger
+from urllib3 import Retry
 
 from .const import (
     GET_LATEST_STATION_DATA_URL,
@@ -38,10 +39,13 @@ from .station_data import StationInfo, station_from_json, region_from_json, Regi
 # and wait for timeout before trying ipv4, so we have to disable ipv6
 requests.packages.urllib3.util.connection.HAS_IPV6 = False
 
-# https://github.com/home-assistant/core/issues/92500#issuecomment-1636743499
-ssl_ctx = requests.packages.urllib3.util.ssl_.create_urllib3_context()
-ssl_ctx.load_default_certs()
-ssl_ctx.options |= 0x4
+def create_session():
+    session = requests.Session()
+    retry = Retry(connect=3, backoff_factor=0.5)
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
 
 
 class IMSEnvista:
@@ -52,6 +56,7 @@ class IMSEnvista:
             raise ValueError
 
         self.token = token
+        self.session = create_session()
 
     @staticmethod
     def _get_channel_id_url_part(channel_id: int) -> str:
@@ -71,11 +76,14 @@ class IMSEnvista:
         """
         logger.debug(f"Fetching data from: {url}")
         try:
-            with requests.packages.urllib3.PoolManager(ssl_context=ssl_ctx) as http:
-                response = http.request("GET", url, headers={
+            response = self.session.get(
+                url,
+                headers={
                     "Accept": "application/vnd.github.v3.text-match+json",
-                    "Authorization": f"ApiToken {self.token}"
-                }, retries=requests.packages.urllib3.Retry(3), timeout=10)
+                    "Authorization": f"ApiToken {self.token}",
+                },
+                timeout=10,
+            )
 
             # If the response was successful, no Exception will be raised
             response.raise_for_status()
@@ -86,6 +94,10 @@ class IMSEnvista:
         except Exception as err:
             logger.error(f"Other error occurred: {err}")  # Python 3.6
             return None
+
+    def close(self):
+        """ Close Requests Session """
+        self.session.close()
 
     def get_latest_station_data(
             self, station_id: int, channel_id: int = None
