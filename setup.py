@@ -1,20 +1,19 @@
-import setuptools
-from ims_envista.version import Version
+import setuptools  # noqa: D100
 
-setuptools.setup(name='ims_envista',
-                 version='0.0.0',
+setuptools.setup(name="ims_envista",
+                 version="0.0.0",
                  long_description_content_type="text/markdown",
-                 description='Israel Meteorological Service Envista API wrapper package',
-                 long_description=open('README.md').read().strip(),
-                 author='Guy Khmelnitsky',
-                 author_email='guykhmel@gmail.com',
-                 url='https://github.com/GuyKh/py-ims-envista',
+                 description="Israel Meteorological Service Envista API wrapper package",
+                 long_description="Israel Meteorological Service Envista API wrapper package",
+                 author="Guy Khmelnitsky",
+                 author_email="guykhmel@gmail.com",
+                 url="https://github.com/GuyKh/py-ims-envista",
                  packages=setuptools.find_packages(),
                  python_requires=">=3.6",
                  install_requires=["requests","urllib3","loguru"],
-                 license='MIT License',
+                 license="MIT License",
                  zip_safe=False,
-                 keywords=['ims','weatheril','Israel Meteorological Service','Meteorological Service','weather'],
+                 keywords=["ims","weatheril","Israel Meteorological Service","Meteorological Service","weather"],
                  classifiers=[    "Intended Audience :: Developers",
                             "Topic :: Software Development :: Build Tools",
                             "License :: OSI Approved :: MIT License",
@@ -26,4 +25,4 @@ setuptools.setup(name='ims_envista',
                             "Programming Language :: Python :: 3.11",
                             "Programming Language :: Python :: 3.12",
                             "Natural Language :: English",
-                            "Operating System :: OS Independent",])
+                            "Operating System :: OS Independent"])

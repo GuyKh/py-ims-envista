@@ -1,32 +1,34 @@
-""" Data Class for Station Data """
+"""Data Class for Station Data."""
 
 from __future__ import annotations
+
 import textwrap
-from typing import List
 from dataclasses import dataclass, field
 
 
 @dataclass
 class Location:
-    """Location (Lat/Long)"""
+    """Location (Lat/Long)."""
+
     latitude: float
     """Latitude"""
     longitude: float
     """Longitude"""
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return textwrap.dedent("""[Lat-{}/Long-{}]""").format(
             self.latitude, self.longitude
         )
 
 
 def location_from_json(json: dict) -> Location:
-    """Converts a JSON object to a Location object."""
+    """Convert a JSON object to a Location object."""
     return Location(json["latitude"], json["longitude"])
 
 @dataclass
 class Monitor:
-    """Monitor"""
+    """Monitor."""
+
     channel_id: int
     """Channel ID"""
     name: str
@@ -43,12 +45,12 @@ class Monitor:
     """Monitored Condition Units"""
     description: str
     """Monitored Condition Description"""
-    def __repr__(self):
+    def __repr__(self) -> str:
         return textwrap.dedent("""{}({})""").format(self.name, self.units)
 
 
 def monitor_from_json(json: dict) -> Monitor:
-    """Converts a JSON object to a Monitor object."""
+    """Convert a JSON object to a Monitor object."""
     return Monitor(
         json["channelId"],
         json["name"],
@@ -62,7 +64,8 @@ def monitor_from_json(json: dict) -> Monitor:
 
 @dataclass
 class StationInfo:
-    """Station Information"""
+    """Station Information."""
+
     station_id: int
     """Station ID"""
     name: str
@@ -83,10 +86,10 @@ class StationInfo:
     """Region ID"""
     station_target: str
     """Station Target"""
-    monitors: List['Monitor'] = field(default_factory=list)
+    monitors: list[Monitor] = field(default_factory=list)
     """List of Monitored Conditions"""
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return textwrap.dedent(
             """{} ({}) - Location: {}, {}ctive, Owner: {}, RegionId: {}, Monitors: {}, StationTarget: {}"""
         ).format(
@@ -102,7 +105,7 @@ class StationInfo:
 
 
 def station_from_json(json: dict) -> StationInfo:
-    """Converts a JSON object to a Station object."""
+    """Convert a JSON object to a Station object."""
     return StationInfo(
         json["stationId"],
         json["name"],
@@ -119,22 +122,23 @@ def station_from_json(json: dict) -> StationInfo:
 
 @dataclass
 class RegionInfo:
-    """Region Information"""
+    """Region Information."""
+
     region_id: int
     """Region ID"""
     name: str
     """Region Name"""
-    stations: List['StationInfo'] = field(default_factory=list)
+    stations: list[StationInfo] = field(default_factory=list)
     """List of Stations in the Region"""
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return textwrap.dedent("""{}({}), Stations: {}""").format(
             self.name, self.region_id, self.stations
         )
 
 
 def region_from_json(json: dict) -> RegionInfo:
-    """Converts a JSON object to a Region object."""
+    """Convert a JSON object to a Region object."""
     return RegionInfo(
         json["regionId"],
         json["name"],

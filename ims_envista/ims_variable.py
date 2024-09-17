@@ -13,5 +13,5 @@ class IMSVariable:
     unit: str
     description: str
 
-    def __repr__(self) -> str:  # noqa: D105
+    def __repr__(self) -> str:
         return f"Code: {self.variable_code} - Unit: ({self.unit}) - Description: {self.description}"

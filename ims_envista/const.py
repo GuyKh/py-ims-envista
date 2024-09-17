@@ -1,4 +1,4 @@
-""" Constant for ims-envista """
+"""Constant for ims-envista."""
 
 from .ims_variable import IMSVariable
 
