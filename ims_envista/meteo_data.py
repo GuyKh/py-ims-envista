@@ -163,6 +163,8 @@ def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
 
 def station_meteo_data_from_json(json: dict) -> StationMeteorologicalReadings:
     station_id = int(json[API_STATION_ID])
-    data = json[API_DATA]
+    data = json.get(API_DATA)
+    if not data:
+        return None
     meteo_data = [meteo_data_from_json(station_id, single_meteo_data) for single_meteo_data in data]
     return StationMeteorologicalReadings(station_id, meteo_data)
