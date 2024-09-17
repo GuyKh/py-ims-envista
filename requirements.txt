@@ -3,6 +3,6 @@ pytest-cov
 pytest-asyncio
 loguru
 aiohttp>=3.10.5 
-setuptools
+setuptools>=70.0.0
 urllib3>=2.2.2 # not directly required, pinned by Snyk to avoid a vulnerability
 zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
