@@ -1,10 +1,16 @@
-import setuptools  # noqa: D100
+# noqa: D100
+from pathlib import Path
+
+import setuptools
+
+# Read the README file content using pathlib and a context manager
+long_description = Path("README.md").read_text(encoding="utf-8").strip()
 
 setuptools.setup(name="ims_envista",
                  version="0.0.0",
                  long_description_content_type="text/markdown",
                  description="Israel Meteorological Service Envista API wrapper package",
-                 long_description="Israel Meteorological Service Envista API wrapper package",
+                 long_description=long_description,
                  author="Guy Khmelnitsky",
                  author_email="guykhmel@gmail.com",
                  url="https://github.com/GuyKh/py-ims-envista",
