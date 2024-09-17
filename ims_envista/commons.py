@@ -1,5 +1,6 @@
 """IMS Envista Commons."""
 
+import asyncio
 import http
 import logging
 import socket
@@ -75,7 +76,7 @@ async def get(
         headers = _get_headers(token)
 
     try:
-        async with async_timeout.timeout(10):
+        async with async_timeout.timeout(30):
             response = await session.get(
                 url=url,
                 headers=headers
@@ -83,27 +84,27 @@ async def get(
             _verify_response_or_raise(response)
             json_resp = await response.json()
 
-    except TimeoutError as exception:
-        msg = f"Timeout error fetching information - {exception}"
+    except (TimeoutError, asyncio.exceptions.TimeoutError) as exception:
+        msg = f"Timeout error fetching information from {url} - {exception}"
         raise ImsEnvistaApiClientCommunicationError(
             msg,
         ) from exception
     except (ClientError, socket.gaierror) as exception:
-        msg = f"Error fetching information - {exception}"
+        msg = f"Error fetching information from {url} - {exception}"
         raise ImsEnvistaApiClientCommunicationError(
             msg,
         ) from exception
     except JSONDecodeError as exception:
-        msg = f"Failed Parsing Response JSON: {exception!s}"
+        msg = f"Failed Parsing Response JSON from {url} - {exception!s}"
         raise ImsEnvistaApiClientError(msg) from exception
     except Exception as exception:  # pylint: disable=broad-except
-        msg = f"Something really wrong happened! - {exception}"
+        msg = f"Something really wrong happened! {url} {exception}"
         raise ImsEnvistaApiClientError(
             msg,
         ) from exception
 
     if response.status != http.HTTPStatus.OK:
-        msg = f"Received Error from IMS Envista API: {response.status, response.reason}"
+        msg = f"Received Error from IMS Envista API from {url}: {response.status, response.reason}"
         raise ImsEnvistaApiClientError(msg)
 
     return json_resp
