@@ -6,10 +6,15 @@ import asyncio
 import atexit
 from typing import TYPE_CHECKING
 
-import commons
 import requests
 from aiohttp import ClientSession, TraceConfig
 
+from .commons import (
+    get,
+    on_request_chunk_sent_debug,
+    on_request_end_debug,
+    on_request_start_debug,
+)
 from .const import (
     API_NAME,
     API_REGION_ID,
@@ -53,9 +58,9 @@ class IMSEnvista:
 
         # Custom Logger to the session
         trace_config = TraceConfig()
-        trace_config.on_request_start.append(commons.on_request_start_debug)
-        trace_config.on_request_chunk_sent.append(commons.on_request_chunk_sent_debug)
-        trace_config.on_request_end.append(commons.on_request_end_debug)
+        trace_config.on_request_start.append(on_request_start_debug)
+        trace_config.on_request_chunk_sent.append(on_request_chunk_sent_debug)
+        trace_config.on_request_end.append(on_request_end_debug)
         trace_config.freeze()
 
         if not session:
@@ -97,7 +102,7 @@ class IMSEnvista:
         get_url = GET_LATEST_STATION_DATA_URL.format(
             str(station_id), self._get_channel_id_url_part(channel_id)
         )
-        return station_meteo_data_from_json(await commons.get(get_url, self._token))
+        return station_meteo_data_from_json(await get(get_url, self._token))
 
     async def get_earliest_station_data(
             self, station_id: int, channel_id: int | None = None
@@ -118,7 +123,7 @@ class IMSEnvista:
         get_url = GET_EARLIEST_STATION_DATA_URL.format(
             str(station_id), self._get_channel_id_url_part(channel_id)
         )
-        return station_meteo_data_from_json(await commons.get(get_url, self._token))
+        return station_meteo_data_from_json(await get(get_url, self._token))
 
     async def get_station_data_from_date(
             self, station_id: int, date_to_query: date, channel_id: int | None = None
@@ -144,7 +149,7 @@ class IMSEnvista:
             str(date_to_query.month),
             str(date_to_query.day),
         )
-        return station_meteo_data_from_json(await commons.get(get_url, self._token))
+        return station_meteo_data_from_json(await get(get_url, self._token))
 
     async def get_station_data_by_date_range(
             self,
@@ -178,7 +183,7 @@ class IMSEnvista:
             str(to_date.strftime("%m")),
             str(to_date.strftime("%d")),
         )
-        return station_meteo_data_from_json(await commons.get(get_url, self._token))
+        return station_meteo_data_from_json(await get(get_url, self._token))
 
     async def get_daily_station_data(
             self, station_id: int, channel_id: int | None = None
@@ -200,7 +205,7 @@ class IMSEnvista:
             str(station_id),
             self._get_channel_id_url_part(channel_id),
         )
-        return station_meteo_data_from_json(await commons.get(get_url, self._token))
+        return station_meteo_data_from_json(await get(get_url, self._token))
 
     async def get_monthly_station_data(
             self,
@@ -232,7 +237,7 @@ class IMSEnvista:
             get_url = GET_MONTHLY_STATION_DATA_BY_MONTH_URL.format(
                 str(station_id), self._get_channel_id_url_part(channel_id), year, month
             )
-        return station_meteo_data_from_json(await commons.get(get_url, self._token))
+        return station_meteo_data_from_json(await get(get_url, self._token))
 
     async def get_all_stations_info(self) -> list[StationInfo]:
         """
@@ -244,7 +249,7 @@ class IMSEnvista:
 
         """
         get_url = GET_ALL_STATIONS_DATA_URL
-        response = await commons.get(get_url, self._token)
+        response = await get(get_url, self._token)
         return [station_from_json(station) for station in response]
 
     async def get_station_info(self, station_id: int) -> StationInfo:
@@ -261,7 +266,7 @@ class IMSEnvista:
 
         """
         get_url = GET_SPECIFIC_STATION_DATA_URL.format(str(station_id))
-        return station_meteo_data_from_json(await commons.get(get_url, self._token))
+        return station_meteo_data_from_json(await get(get_url, self._token))
 
     async def get_all_regions_info(self) -> list[RegionInfo]:
         """
@@ -273,7 +278,7 @@ class IMSEnvista:
 
         """
         get_url = GET_ALL_REGIONS_DATA_URL
-        response = await commons.get(get_url, self._token)
+        response = await get(get_url, self._token)
         regions = []
         for region in response:
             stations = [station_from_json(station) for station in region[API_STATIONS]]
@@ -296,7 +301,7 @@ class IMSEnvista:
 
         """
         get_url = GET_SPECIFIC_REGION_DATA_URL.format(str(region_id))
-        response = await commons.get(get_url, self._token)
+        response = await get(get_url, self._token)
         return region_from_json(response)
 
     def get_metrics_descriptions(self) -> list[IMSVariable]:
