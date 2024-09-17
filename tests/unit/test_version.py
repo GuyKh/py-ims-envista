@@ -1,5 +1,6 @@
 from ims_envista.version import Version
-from tests import *
+import unittest
+import pytest
 
 
 class TestVersion(unittest.TestCase):
@@ -9,5 +10,5 @@ class TestVersion(unittest.TestCase):
 
     def test_version_immutable(self):
         ver = Version("1.0.0")
-        with pytest.raises(TypeError) as e:
+        with pytest.raises(TypeError):
             ver.number = "1.1.0"
