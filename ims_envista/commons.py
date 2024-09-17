@@ -2,9 +2,9 @@
 
 import http
 import logging
-import uuid
 from json import JSONDecodeError
 from typing import Any
+from uuid import UUID
 
 from aiohttp import (
     ClientError,
@@ -46,14 +46,14 @@ async def on_request_end_debug(session: ClientSession, context, params: TraceReq
     logger.debug("HTTP %s Response <%s>: %s", params.method, params.response.status, response_text)
 
 
-def get_headers(token: uuid | str) -> dict[str, str]:
+def get_headers(token: UUID | str) -> dict[str, str]:
     return {
         "Accept": "application/vnd.github.v3.text-match+json",
         "Authorization": f"ApiToken {token!s}"
     }
 
 async def get(
-    session: ClientSession, url: str, token: str | uuid, headers: dict | None = None
+    session: ClientSession, url: str, token: UUID | str, headers: dict | None = None
 ) -> dict[str, Any]:
     try:
         if not headers:
