@@ -6,7 +6,6 @@ import asyncio
 import atexit
 from typing import TYPE_CHECKING
 
-import requests
 from aiohttp import ClientSession, TraceConfig
 
 from .commons import (
@@ -43,10 +42,6 @@ if TYPE_CHECKING:
     from uuid import UUID
 
     from .ims_variable import IMSVariable
-
-# ims.gov.il does not support ipv6 yet, `requests` use ipv6 by default
-# and wait for timeout before trying ipv4, so we have to disable ipv6
-requests.packages.urllib3.util.connection.HAS_IPV6 = False
 
 
 class IMSEnvista:

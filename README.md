@@ -17,8 +17,8 @@
 
 ## Components and Frameworks used
 
+* [aiohttp](https://pypi.org/project/aiohttp/)
 * [Loguru](https://pypi.org/project/loguru/)
-* [Requests ](https://pypi.org/project/requests/)
 * [urllib3](https://pypi.org/project/urllib3/)
 
 ## Installing
