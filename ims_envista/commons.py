@@ -2,12 +2,15 @@
 
 import http
 import logging
+import socket
 from json import JSONDecodeError
 from typing import Any
 from uuid import UUID
 
+import async_timeout
 from aiohttp import (
     ClientError,
+    ClientResponse,
     ClientSession,
     TraceRequestChunkSentParams,
     TraceRequestEndParams,
@@ -16,19 +19,22 @@ from aiohttp import (
 
 logger = logging.getLogger(__name__)
 
-class IMSEnvistaError(Exception):
-    """
-    Exception raised for errors in the IMS Envista API.
 
-    Attributes
-    ----------
-        error -- description of the error
+class ImsEnvistaApiClientError(Exception):
+    """Exception to indicate a general API error."""
 
-    """
 
-    def __init__(self, error: str) -> None:
-        self.error = error
-        super().__init__(f"{self.error}")
+class ImsEnvistaApiClientCommunicationError(
+    ImsEnvistaApiClientError,
+):
+    """Exception to indicate a communication error."""
+
+
+class ImsEnvistaApiClientAuthenticationError(
+    ImsEnvistaApiClientError,
+):
+    """Exception to indicate an authentication error."""
+
 
 async def on_request_start_debug(session: ClientSession, context,params: TraceRequestStartParams) -> None:  # noqa: ANN001, ARG001
     logger.debug("HTTP %s: %s", params.method, params.url)
@@ -46,33 +52,58 @@ async def on_request_end_debug(session: ClientSession, context, params: TraceReq
     logger.debug("HTTP %s Response <%s>: %s", params.method, params.response.status, response_text)
 
 
-def get_headers(token: UUID | str) -> dict[str, str]:
+def _get_headers(token: UUID | str) -> dict[str, str]:
     return {
         "Accept": "application/vnd.github.v3.text-match+json",
         "Authorization": f"ApiToken {token!s}"
     }
 
+def _verify_response_or_raise(response: ClientResponse) -> None:
+    """Verify that the response is valid."""
+    if response.status in (401, 403):
+        msg = "Invalid credentials"
+        raise ImsEnvistaApiClientAuthenticationError(
+            msg,
+        )
+    response.raise_for_status()
+
+
 async def get(
     session: ClientSession, url: str, token: UUID | str, headers: dict | None = None
 ) -> dict[str, Any]:
+    if not headers:
+        headers = _get_headers(token)
+
     try:
-        if not headers:
-            headers = get_headers(token)
+        async with async_timeout.timeout(10):
+            response = await session.get(
+                url=url,
+                headers=headers
+            )
+            _verify_response_or_raise(response)
+            json_resp = await response.json()
 
-        resp = await session.get(url=url, headers=headers)
-        json_resp: dict = await resp.json(content_type=None)
-    except TimeoutError as ex:
-        msg = f"Failed to communicate with IMS Envista API due to time out: ({ex!s})"
-        raise IMSEnvistaError(msg) from ex
-    except ClientError as ex:
-        msg = f"Failed to communicate with  IMS Envistadue to ClientError: ({ex!s})"
-        raise IMSEnvistaError(msg) from ex
-    except JSONDecodeError as ex:
-        msg = f"Received invalid response from IMS Envista API: {ex!s}"
-        raise IMSEnvistaError(msg) from ex
+    except TimeoutError as exception:
+        msg = f"Timeout error fetching information - {exception}"
+        raise ImsEnvistaApiClientCommunicationError(
+            msg,
+        ) from exception
+    except (ClientError, socket.gaierror) as exception:
+        msg = f"Error fetching information - {exception}"
+        raise ImsEnvistaApiClientCommunicationError(
+            msg,
+        ) from exception
+    except JSONDecodeError as exception:
+        msg = f"Failed Parsing Response JSON: {exception!s}"
+        raise ImsEnvistaApiClientError(msg) from exception
+    except Exception as exception:  # pylint: disable=broad-except
+        msg = f"Something really wrong happened! - {exception}"
+        raise ImsEnvistaApiClientError(
+            msg,
+        ) from exception
 
-    if resp.status != http.HTTPStatus.OK:
-        msg = f"Received Error from IMS Envista API: {resp.status, resp.reason}"
-        raise IMSEnvistaError(msg)
+    if response.status != http.HTTPStatus.OK:
+        msg = f"Received Error from IMS Envista API: {response.status, response.reason}"
+        raise ImsEnvistaApiClientError(msg)
 
     return json_resp
