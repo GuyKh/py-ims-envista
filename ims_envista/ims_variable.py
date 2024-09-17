@@ -1,10 +1,14 @@
-""" Data Class for IMS Variable """
+"""Data Class for IMS Variable."""
 
 from __future__ import annotations
+
 from dataclasses import dataclass
+
 
 @dataclass
 class IMSVariable:
+    """IMS Envista Variable."""
+
     variable_code: str
     unit: str
     description: str

@@ -1,39 +1,40 @@
-""" Data Class for IMS Meteorological Readings """
+"""Data Class for IMS Meteorological Readings."""
 
 from __future__ import annotations
+
 import textwrap
-from typing import List
 from dataclasses import dataclass, field
 from datetime import datetime
 
-
 from .const import (
+    API_CHANNELS,
+    API_DATA,
+    API_DATETIME,
+    API_NAME,
     API_RAIN,
-    API_WS_MAX,
-    API_WD_MAX,
-    API_WS,
-    API_WD,
+    API_RH,
+    API_STATION_ID,
+    API_STATUS,
     API_STD_WD,
     API_TD,
-    API_RH,
     API_TD_MAX,
     API_TD_MIN,
+    API_VALID,
+    API_VALUE,
+    API_WD,
+    API_WD_MAX,
+    API_WS,
     API_WS_1MM,
     API_WS_10MM,
+    API_WS_MAX,
     VARIABLES,
-    API_DATETIME,
-    API_CHANNELS,
-    API_VALID,
-    API_STATUS,
-    API_NAME,
-    API_VALUE,
-    API_STATION_ID,
-    API_DATA,
 )
+
 
 @dataclass
 class MeteorologicalData:
-    """Meteorological Data"""
+    """Meteorological Data."""
+
     station_id: int
     """Station ID"""
     datetime: datetime
@@ -62,7 +63,7 @@ class MeteorologicalData:
     """Maximum 1 minute wind speed in m/s"""
     ws_10mm: float
     """Maximum 10 minute wind speed in m/s"""
-        
+
 
     def _pretty_print(self) -> str:
         return textwrap.dedent(
@@ -106,9 +107,11 @@ class MeteorologicalData:
 
 @dataclass
 class StationMeteorologicalReadings:
+    """Station Meteorological Readings."""
+
     station_id: int
     """ Station Id"""
-    data: List['MeteorologicalData'] = field(default_factory=list)
+    data: list[MeteorologicalData] = field(default_factory=list)
     """ List of Meteorological Data """
 
     def __repr__(self) -> str:
@@ -118,7 +121,7 @@ class StationMeteorologicalReadings:
 
 
 def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
-    """Create a MeteorologicalData object from a JSON object"""
+    """Create a MeteorologicalData object from a JSON object."""
     dt = datetime.fromisoformat(data[API_DATETIME])
     channel_value_dict = {}
     for channel_value in data[API_CHANNELS]:
@@ -160,8 +163,8 @@ def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
 
 def station_meteo_data_from_json(json: dict) -> StationMeteorologicalReadings:
     station_id = int(json[API_STATION_ID])
-    data = json[API_DATA]
-    meteo_data = []
-    for single_meteo_data in data:
-        meteo_data.append(meteo_data_from_json(station_id, single_meteo_data))
+    data = json.get(API_DATA)
+    if not data:
+        return None
+    meteo_data = [meteo_data_from_json(station_id, single_meteo_data) for single_meteo_data in data]
     return StationMeteorologicalReadings(station_id, meteo_data)

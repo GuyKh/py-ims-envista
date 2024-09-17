@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: Unittest
     env:
-      IMS_TOKEN: '${{ secrets.IMS_TOKEN }}'
+      IMS_TOKEN: ${{ secrets.IMS_TOKEN }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -61,6 +61,8 @@ jobs:
     - name: Run UnitTests
       run: >-
         python3 -m unittest discover
+      env:
+        IMS_TOKEN: ${{ secrets.IMS_TOKEN }}
 
     #- name: Publish package to TestPyPI
     #  uses: pypa/gh-action-pypi-publish@release/v1

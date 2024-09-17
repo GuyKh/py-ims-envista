@@ -17,8 +17,8 @@
 
 ## Components and Frameworks used
 
+* [aiohttp](https://pypi.org/project/aiohttp/)
 * [Loguru](https://pypi.org/project/loguru/)
-* [Requests ](https://pypi.org/project/requests/)
 * [urllib3](https://pypi.org/project/urllib3/)
 
 ## Installing
@@ -41,7 +41,7 @@ from ims_envista import IMSEnvista
 ims = IMSEnvista("2cc57fb1-cda5-4965-af12-b397e5b8eb32")
 
 # Get JERUSALEM stations for getting an id
-[station for station in ims.get_all_stations_info() if station.name.startswith("JERUSALEM")]
+[station for station in await ims.get_all_stations_info() if station.name.startswith("JERUSALEM")]
 > [JERUSALEM GIVAT RAM(22) - Location: [Lat - 31.771 / Long - 35.197], Active, Owner: ims, RegionId: 7, Monitors: [
     Rain(mm), WSmax(m / sec), WDmax(deg), WS(m / sec), WD(deg), STDwd(deg), TD(degC), RH( %), TDmax(degC), TDmin(
     degC), Grad(w / m2), DiffR(w / m2), WS1mm(m / sec), Ws10mm(m / sec), Time(hhmm), NIP(
@@ -66,7 +66,7 @@ RAM_1m(249) - Location: [Lat - 31.7704 / Long - 35.1973], Active, Owner: ims, Re
                                                                                                           mm)], StationTarget:]
 
 # Get latest data by a station id
-ims.get_latest_station_data(23)
+await ims.get_latest_station_data(23)
 > Station(23), Data: [Station: 23, Date: 2023 - 02 - 21
 12: 00:00 + 02: 00, Readings: [(TD: 17.6°C), (TDmax: 17.8°C), (TDmin: 17.5°C), (RH: 58.0 %), (Rain: 0.0mm),
                                (WS: 2.8m / s), (WSmax: 3.7m / s), (WD: 285.0deg), (WDmax: 289.0deg), (STDwd: 10.5deg),

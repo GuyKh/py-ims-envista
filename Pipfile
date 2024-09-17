@@ -6,11 +6,11 @@ name = "pypi"
 [packages]
 pytest = "*"
 pytest-cov = "*"
-requests = "*"
 loguru = "*"
+aiohttp = "*" 
 
 [dev-packages]
 
 [requires]
-python_version = "3.9"
-python_full_version = "3.9.6"
+python_version = "3.12"
+python_full_version = "3.12.0"
