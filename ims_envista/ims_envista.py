@@ -266,7 +266,7 @@ class IMSEnvista:
 
         """
         get_url = GET_SPECIFIC_STATION_DATA_URL.format(str(station_id))
-        return station_meteo_data_from_json(await get(session=self._session, url=get_url, token=self._token))
+        return station_from_json(await get(session=self._session, url=get_url, token=self._token))
 
     async def get_all_regions_info(self) -> list[RegionInfo]:
         """
