@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import datetime
 import textwrap
+import time
 from dataclasses import dataclass, field
 from datetime import datetime
 
@@ -19,6 +21,8 @@ from .const import (
     API_TD,
     API_TD_MAX,
     API_TD_MIN,
+    API_TG,
+    API_TIME,
     API_VALID,
     API_VALUE,
     API_WD,
@@ -57,17 +61,30 @@ class MeteorologicalData:
     """Maximum Temperature in °C"""
     td_min: float
     """Minimum Temperature in °C"""
+    tg: float
+    """Ground Temperature in °C"""
+    tw: float
+    """TW Temperature (?) in °C"""
     rh: float
     """Relative humidity in %"""
     ws_1mm: float
     """Maximum 1 minute wind speed in m/s"""
     ws_10mm: float
     """Maximum 10 minute wind speed in m/s"""
-
+    time: datetime.time
+    """Time"""
+    bp: float
+    """Maximum barometric pressure in mb"""
+    diff_r: float
+    """Distributed radiation in w/m^2"""
+    grad: float
+    """Global radiation in w/m^2"""
+    nip: float
+    """Direct radiation in w/m^2"""
 
     def _pretty_print(self) -> str:
         return textwrap.dedent(
-            """Station: {}, Date: {}, Readings: [(TD: {}{}), (TDmax: {}{}), (TDmin: {}{}), (RH: {}{}), (Rain: {}{}), (WS: {}{}), (WSmax: {}{}), (WD: {}{}), (WDmax: {}{}),  (STDwd: {}{}), (WS1mm: {}{}), (WS10mm: {}{})]
+            """Station: {}, Date: {}, Readings: [(TD: {}{}), (TDmax: {}{}), (TDmin: {}{}), (TG: {}{}), (RH: {}{}), (Rain: {}{}), (WS: {}{}), (WSmax: {}{}), (WD: {}{}), (WDmax: {}{}),  (STDwd: {}{}), (WS1mm: {}{}), (WS10mm: {}{}), (Time: {}{})]
             """
         ).format(
             self.station_id,
@@ -78,6 +95,8 @@ class MeteorologicalData:
             VARIABLES[API_TD_MAX].unit,
             self.td_min,
             VARIABLES[API_TD_MIN].unit,
+            self.tg,
+            VARIABLES[API_TG].unit,
             self.rh,
             VARIABLES[API_RH].unit,
             self.rain,
@@ -96,6 +115,8 @@ class MeteorologicalData:
             VARIABLES[API_WS_1MM].unit,
             self.ws_10mm,
             VARIABLES[API_WS_10MM].unit,
+            self.time,
+            VARIABLES[API_TIME].unit,
         )
 
     def __str__(self) -> str:
@@ -142,6 +163,8 @@ def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
     td_min = channel_value_dict.get(API_TD_MIN)
     ws_1mm = channel_value_dict.get(API_WS_1MM)
     ws_10mm = channel_value_dict.get(API_WS_10MM)
+    tg = channel_value_dict.get(API_TG)
+    dt = time.strptime(str(int(channel_value_dict.get(API_TIME))), "%H%M")
 
     return MeteorologicalData(
         station_id,
@@ -156,8 +179,10 @@ def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
         rh,
         td_max,
         td_min,
+        tg,
         ws_1mm,
         ws_10mm,
+        time
     )
 
 
