@@ -53,7 +53,7 @@ API_DATA = "data"
 
 VARIABLES = {
     API_BP: IMSVariable("BP", "hPa", "Average pressure at station level"),
-    API_DIFF: IMSVariable("Diff", "w/m²", "Diffused radiation"),
+    API_DIFF: IMSVariable("DiffR", "w/m²", "Diffused radiation"),
     API_GRAD: IMSVariable("Grad", "w/m²", "Global radiation"),
     API_NIP: IMSVariable("NIP", "w/m²", "Direct radiation"),
     API_RAIN: IMSVariable("Rain", "mm", "Rainfall"),

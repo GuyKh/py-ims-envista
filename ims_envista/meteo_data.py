@@ -120,8 +120,8 @@ class MeteorologicalData:
             VARIABLES[API_WS_1MM].unit,
             self.ws_10mm,
             VARIABLES[API_WS_10MM].unit,
-            self.time,
-            VARIABLES[API_TIME].unit,
+            f"{self.time.isoformat()}" if self.time else "",
+            " " + VARIABLES[API_TIME].unit,
         )
 
     def __str__(self) -> str:
@@ -172,7 +172,8 @@ def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
     tw = channel_value_dict.get(API_TW)
     time_val = channel_value_dict.get(API_TIME)
     if time_val:
-        time_val = time.strptime(str(int(time_val)), "%H%M")
+        t = time.strptime(str(int(time_val)), "%H%M")
+        time_val = dttime(t.tm_hour, t.tm_min)
     bp = channel_value_dict.get(API_BP)
     diff_r = channel_value_dict.get(API_DIFF)
     grad = channel_value_dict.get(API_GRAD)
