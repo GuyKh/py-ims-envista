@@ -36,7 +36,7 @@ from .const import (
     API_WS_1MM,
     API_WS_10MM,
     API_WS_MAX,
-    VARIABLES,
+    VARIABLES, API_RAIN_1_MIN,
 )
 
 
@@ -86,6 +86,8 @@ class MeteorologicalData:
     """Global radiation in w/m^2"""
     nip: float
     """Direct radiation in w/m^2"""
+    rain_1_min: float
+    """Rainfall per minute in mm"""
 
     def _pretty_print(self) -> str:
         return textwrap.dedent(
@@ -177,6 +179,7 @@ def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
     diff_r = channel_value_dict.get(API_DIFF)
     grad = channel_value_dict.get(API_GRAD)
     nip = channel_value_dict.get(API_NIP)
+    rain_1_min = channel_value_dict.get(API_RAIN_1_MIN)
 
     return MeteorologicalData(
         station_id=station_id,
@@ -199,11 +202,12 @@ def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
         bp=bp,
         diff_r=diff_r,
         grad=grad,
-        nip=nip
+        nip=nip,
+        rain_1_min=rain_1_min
     )
 
 
-def station_meteo_data_from_json(json: dict) -> StationMeteorologicalReadings:
+def station_meteo_data_from_json(json: dict) -> StationMeteorologicalReadings | None:
     station_id = int(json[API_STATION_ID])
     data = json.get(API_DATA)
     if not data:
