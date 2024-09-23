@@ -76,7 +76,7 @@ async def get(
         headers = _get_headers(token)
 
     try:
-        async with async_timeout.timeout(60):
+        async with async_timeout.timeout(180):
             response = await session.get(
                 url=url,
                 headers=headers
