@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+import datetime
 import textwrap
 import time
 from dataclasses import dataclass, field
-from datetime import datetime
-from datetime import time as dttime
+
+import pytz
 
 from .const import (
     API_BP,
@@ -18,6 +19,7 @@ from .const import (
     API_NAME,
     API_NIP,
     API_RAIN,
+    API_RAIN_1_MIN,
     API_RH,
     API_STATION_ID,
     API_STATUS,
@@ -36,7 +38,7 @@ from .const import (
     API_WS_1MM,
     API_WS_10MM,
     API_WS_MAX,
-    VARIABLES, API_RAIN_1_MIN,
+    VARIABLES,
 )
 
 
@@ -46,7 +48,7 @@ class MeteorologicalData:
 
     station_id: int
     """Station ID"""
-    datetime: datetime
+    datetime: datetime.datetime
     """Date and time of the data"""
     rain: float
     """Rainfall in mm"""
@@ -76,7 +78,7 @@ class MeteorologicalData:
     """Maximum 1 minute wind speed in m/s"""
     ws_10mm: float
     """Maximum 10 minute wind speed in m/s"""
-    time: dttime
+    time: datetime.time
     """Time"""
     bp: float
     """Maximum barometric pressure in mb"""
@@ -150,7 +152,12 @@ class StationMeteorologicalReadings:
 
 def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
     """Create a MeteorologicalData object from a JSON object."""
-    dt = datetime.fromisoformat(data[API_DATETIME])
+    tz = pytz.timezone("Asia/Jerusalem")
+    # is_dst = bool(time.localtime(time.time()).tm_isdst)  # noqa: ERA001
+
+    dt = datetime.datetime.fromisoformat(data[API_DATETIME])
+    dt.replace(tzinfo=tz)
+
     channel_value_dict = {}
     for channel_value in data[API_CHANNELS]:
         if channel_value[API_VALID] is True and channel_value[API_STATUS] == 1:
@@ -174,12 +181,15 @@ def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
     tw = channel_value_dict.get(API_TW)
     time_val = channel_value_dict.get(API_TIME)
     if time_val:
-        time_val = time.strptime(str(int(time_val)), "%H%M")
+        t = time.strptime(str(int(time_val)), "%H%M")
+        time_val = datetime.time(t.tm_hour, t.tm_min, tzinfo=tz)
     bp = channel_value_dict.get(API_BP)
     diff_r = channel_value_dict.get(API_DIFF)
     grad = channel_value_dict.get(API_GRAD)
     nip = channel_value_dict.get(API_NIP)
     rain_1_min = channel_value_dict.get(API_RAIN_1_MIN)
+
+
 
     return MeteorologicalData(
         station_id=station_id,
