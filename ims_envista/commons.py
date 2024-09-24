@@ -1,7 +1,6 @@
 """IMS Envista Commons."""
 
 import asyncio
-import chardet
 import http
 import logging
 import socket
@@ -51,9 +50,7 @@ async def on_request_chunk_sent_debug(
 
 async def on_request_end_debug(session: ClientSession, context, params: TraceRequestEndParams) -> None:  # noqa: ANN001, ARG001
     response_bytes = await params.response.read()  # Read the raw bytes
-    encoding = params.response.charset or chardet.detect(response_bytes)['encoding']  # Get encoding
-    response_text = response_bytes.decode(encoding, errors='replace')  # Decode with error handling
-    logger.debug("HTTP %s Response <%s>: %s", params.method, params.response.status, response_text)
+    logger.debug("HTTP %s Response <%s>: %s", params.method, params.response.status, response_bytes)
 
 
 def _get_headers(token: UUID | str) -> dict[str, str]:
