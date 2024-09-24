@@ -1,6 +1,7 @@
 """IMS Envista Commons."""
 
 import asyncio
+import chardet
 import http
 import logging
 import socket
