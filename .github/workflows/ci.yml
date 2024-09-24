@@ -52,7 +52,7 @@ jobs:
       run: >-
         python setup.py install
 
-    - uses: szenius/set-timezone@v1.0
+    - uses: szenius/set-timezone@v1.2
       with:
         timezoneLinux: "Asia/Jerusalem"
         timezoneMacos: "Asia/Jerusalem"
