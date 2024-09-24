@@ -3,6 +3,7 @@ pytest-cov
 pytest-asyncio
 loguru
 async_timeout
+pytz
 aiohttp>=3.10.5 
 setuptools>=70.0.0
 urllib3>=2.2.2 # not directly required, pinned by Snyk to avoid a vulnerability
