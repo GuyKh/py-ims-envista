@@ -153,7 +153,7 @@ tz = pytz.timezone("Asia/Jerusalem")
 
 def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
     """Create a MeteorologicalData object from a JSON object."""
-    # is_dst = bool(time.localtime(time.time()).tm_isdst)  # noqa: ERA001
+    is_dst = bool(time.localtime(time.time()).tm_isdst)
 
     dt = datetime.datetime.fromisoformat(data[API_DATETIME])
     dt.replace(tzinfo=tz)
@@ -189,7 +189,10 @@ def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
     nip = channel_value_dict.get(API_NIP)
     rain_1_min = channel_value_dict.get(API_RAIN_1_MIN)
 
-
+    if is_dst and time_val:
+        # Strange IMS logic :o
+        dt = dt + datetime.timedelta(hours=1)
+        time_val = time_val.replace(hour=(time_val.hour+1)%24)
 
     return MeteorologicalData(
         station_id=station_id,
