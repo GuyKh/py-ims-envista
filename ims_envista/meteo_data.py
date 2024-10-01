@@ -149,10 +149,10 @@ class StationMeteorologicalReadings:
             self.station_id, self.data
         )
 
+tz = pytz.timezone("Asia/Jerusalem")
 
 def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
     """Create a MeteorologicalData object from a JSON object."""
-    tz = pytz.timezone("Asia/Jerusalem")
     # is_dst = bool(time.localtime(time.time()).tm_isdst)  # noqa: ERA001
 
     dt = datetime.datetime.fromisoformat(data[API_DATETIME])
