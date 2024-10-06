@@ -151,12 +151,31 @@ class StationMeteorologicalReadings:
 
 tz = pytz.timezone("Asia/Jerusalem")
 
+
+def _fix_datetime_offset(dt):
+    dt = dt.replace(tzinfo=None)
+    dt = tz.localize(dt)
+
+    # Get the UTC offset in seconds
+    offset_seconds = dt.utcoffset().total_seconds()
+
+    # Create a fixed timezone with the same offset and name
+    fixed_timezone = datetime.timezone(datetime.timedelta(seconds=offset_seconds), dt.tzname())
+
+    # Replace the pytz tzinfo with the fixed timezone
+    dt = dt.replace(tzinfo=fixed_timezone)
+
+    is_dst = dt.dst() != datetime.timedelta(0)
+    if is_dst:
+        dt = dt + datetime.timedelta(hours=1)
+
+    return dt,is_dst
+
+
 def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
     """Create a MeteorologicalData object from a JSON object."""
-    is_dst = bool(time.localtime(time.time()).tm_isdst)
-
     dt = datetime.datetime.fromisoformat(data[API_DATETIME])
-    dt.replace(tzinfo=tz)
+    dt, is_dst = _fix_datetime_offset(dt)
 
     channel_value_dict = {}
     for channel_value in data[API_CHANNELS]:
