@@ -66,6 +66,12 @@ def _verify_response_or_raise(response: ClientResponse) -> None:
         raise ImsEnvistaApiClientAuthenticationError(
             msg,
         )
+    content_type = response.headers.get("Content-Type")
+    if content_type and "application/json" not in content_type:
+        msg = f"Invalid response from IMS - bad Content-Type: {content_type}"
+        raise ImsEnvistaApiClientError(
+            msg,
+        )
     response.raise_for_status()
 
 
