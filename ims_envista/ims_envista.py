@@ -49,7 +49,8 @@ class IMSEnvista:
 
     def __init__(self, token: UUID | str, session: ClientSession | None = None) -> None:
         if not token:
-            raise ValueError
+            err_msg = "Missing IMS Token"
+            raise ValueError(err_msg)
 
         # Custom Logger to the session
         trace_config = TraceConfig()
