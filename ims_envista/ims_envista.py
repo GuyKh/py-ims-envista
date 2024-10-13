@@ -6,14 +6,9 @@ import asyncio
 import atexit
 from typing import TYPE_CHECKING
 
-from aiohttp import ClientSession, TraceConfig
+from aiohttp import ClientSession
 
-from .commons import (
-    get,
-    on_request_chunk_sent_debug,
-    on_request_end_debug,
-    on_request_start_debug,
-)
+from .commons import get
 from .const import (
     API_NAME,
     API_REGION_ID,
@@ -52,18 +47,9 @@ class IMSEnvista:
             err_msg = "Missing IMS Token"
             raise ValueError(err_msg)
 
-        # Custom Logger to the session
-        trace_config = TraceConfig()
-        trace_config.on_request_start.append(on_request_start_debug)
-        trace_config.on_request_chunk_sent.append(on_request_chunk_sent_debug)
-        trace_config.on_request_end.append(on_request_end_debug)
-        trace_config.freeze()
-
         if not session:
             session = ClientSession(trace_configs=[trace_config])
             atexit.register(self._shutdown)
-        else:
-            session.trace_configs.append(trace_config)
 
         self._session = session
         self._token = token
