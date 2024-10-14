@@ -48,7 +48,7 @@ class IMSEnvista:
             raise ValueError(err_msg)
 
         if not session:
-            session = ClientSession(trace_configs=[trace_config])
+            session = ClientSession()
             atexit.register(self._shutdown)
 
         self._session = session
