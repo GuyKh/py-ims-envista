@@ -22,6 +22,9 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self) -> None:
         """Do Setup."""
         self.token = os.environ.get("IMS_TOKEN")
+        if not self.token:
+            pytest.fail(f"Failed to load IMS Token")
+        
         self.station_id = 178  # TEL AVIV COAST station
         self.region_id = 13
         self.channel_id = 7  # TD = Temperature Channel
