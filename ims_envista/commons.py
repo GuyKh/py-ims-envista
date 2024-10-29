@@ -90,4 +90,5 @@ async def get(
         msg = f"Received Error from IMS Envista API from {url}: {response.status, response.reason}"
         raise ImsEnvistaApiClientError(msg)
 
+    _LOGGER.debug("Response from %s: %s", url, json_resp)
     return json_resp

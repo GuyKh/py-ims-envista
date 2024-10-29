@@ -3,8 +3,8 @@
 import os
 import unittest
 from datetime import date, datetime, timedelta
-from zoneinfo import ZoneInfo
 
+import pytest
 import pytz
 from aiohttp import ClientSession
 
@@ -23,8 +23,8 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
         """Do Setup."""
         self.token = os.environ.get("IMS_TOKEN")
         if not self.token:
-            pytest.fail(f"Failed to load IMS Token")
-        
+            pytest.fail("Failed to load IMS Token")
+
         self.station_id = 178  # TEL AVIV COAST station
         self.region_id = 13
         self.channel_id = 7  # TD = Temperature Channel
