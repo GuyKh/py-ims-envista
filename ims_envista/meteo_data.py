@@ -41,6 +41,7 @@ from .const import (
     VARIABLES,
 )
 
+MAX_HOUR_INT = 24
 
 @dataclass
 class MeteorologicalData:
@@ -152,7 +153,7 @@ class StationMeteorologicalReadings:
 tz = pytz.timezone("Asia/Jerusalem")
 
 
-def _fix_datetime_offset(dt):
+def _fix_datetime_offset(dt: datetime.datetime) -> tuple[datetime.datetime, bool]:
     dt = dt.replace(tzinfo=None)
     dt = tz.localize(dt)
 
@@ -200,7 +201,11 @@ def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
     tw = channel_value_dict.get(API_TW)
     time_val = channel_value_dict.get(API_TIME)
     if time_val:
-        t = time.strptime(str(int(time_val)), "%H%M")
+        time_int = int(time_val)
+        if time_int <= MAX_HOUR_INT:
+            t = time.strptime(str(time_int), "%H")
+        else :
+            t = time.strptime(str(time_int), "%H%M")
         time_val = datetime.time(t.tm_hour, t.tm_min, tzinfo=tz)
     bp = channel_value_dict.get(API_BP)
     diff_r = channel_value_dict.get(API_DIFF)

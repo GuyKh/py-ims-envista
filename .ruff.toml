@@ -19,7 +19,8 @@ ignore = [
     "COM812", # incompatible with formatter
     "ISC001", # incompatible with formatter
     "S101",  # Assert,
-    "E501"  # Line too long
+    "E501",  # Line too long
+    "DTZ005" # datetime.now() without timezone
 ]
 
 [lint.flake8-pytest-style]
