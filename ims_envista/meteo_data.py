@@ -166,7 +166,7 @@ def _fix_datetime_offset(dt: datetime.datetime) -> tuple[datetime.datetime, bool
     # Replace the pytz tzinfo with the fixed timezone
     dt = dt.replace(tzinfo=fixed_timezone)
 
-    is_dst = dt.dst() != datetime.timedelta(0)
+    is_dst = dt.dst() and dt.dst() != datetime.timedelta(0)
     if is_dst:
         dt = dt + datetime.timedelta(hours=1)
 
