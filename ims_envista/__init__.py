@@ -5,10 +5,13 @@ from .commons import (
     ImsEnvistaApiClientError,
 )
 from .ims_envista import IMSEnvista
+from .meteo_data import StationMeteorologicalReadings, meteo_data_from_json
 
 __all__ = [
     "IMSEnvista",
     "ImsEnvistaApiClientError",
     "ImsEnvistaApiClientAuthenticationError",
-    "ImsEnvistaApiClientCommunicationError"
+    "ImsEnvistaApiClientCommunicationError",
+    "StationMeteorologicalReadings",
+    "meteo_data_from_json"
 ]
