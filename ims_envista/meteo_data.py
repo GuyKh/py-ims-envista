@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime
+import logging
 import textwrap
 import time
 from dataclasses import dataclass, field
@@ -41,7 +42,8 @@ from .const import (
     VARIABLES,
 )
 
-MAX_HOUR_INT = 24
+_LOGGER = logging.getLogger(__name__)
+MAX_HOUR_INT = 60
 
 @dataclass
 class MeteorologicalData:
@@ -92,42 +94,33 @@ class MeteorologicalData:
     rain_1_min: float
     """Rainfall per minute in mm"""
 
+    def _prety_print_field(self, value: float | str | None, unit: str | None) -> str:
+        """Pretty Print a specific field."""
+        if value:
+            return f"{value!s}{unit if unit else ''}"
+        return "None"
+
     def _pretty_print(self) -> str:
-        return textwrap.dedent(
-            """Station: {}, Date: {}, Readings: [(TD: {}{}), (TDmax: {}{}), (TDmin: {}{}), (TG: {}{}), (RH: {}{}), (Rain: {}{}), (WS: {}{}), (WSmax: {}{}), (WD: {}{}), (WDmax: {}{}),  (STDwd: {}{}), (WS1mm: {}{}), (WS10mm: {}{}), (Time: {}{})]
-            """
-        ).format(
-            self.station_id,
-            self.datetime,
-            self.td,
-            VARIABLES[API_TD].unit,
-            self.td_max,
-            VARIABLES[API_TD_MAX].unit,
-            self.td_min,
-            VARIABLES[API_TD_MIN].unit,
-            self.tg,
-            VARIABLES[API_TG].unit,
-            self.rh,
-            VARIABLES[API_RH].unit,
-            self.rain,
-            VARIABLES[API_RAIN].unit,
-            self.ws,
-            VARIABLES[API_WS].unit,
-            self.ws_max,
-            VARIABLES[API_WS_MAX].unit,
-            self.wd,
-            VARIABLES[API_WD].unit,
-            self.wd_max,
-            VARIABLES[API_WD_MAX].unit,
-            self.std_wd,
-            VARIABLES[API_STD_WD].unit,
-            self.ws_1mm,
-            VARIABLES[API_WS_1MM].unit,
-            self.ws_10mm,
-            VARIABLES[API_WS_10MM].unit,
-            self.time,
-            VARIABLES[API_TIME].unit,
-        )
+        """Pretty Print."""
+        return (
+                f"StationID: {self._prety_print_field(self.station_id, None)}, "
+                f"Date: {self._prety_print_field(self.datetime, None)}, "
+                f"Readings: ["
+                f"(TD: {self._prety_print_field(self.td, VARIABLES[API_TD].unit)}), "
+                f"(TDmax: {self._prety_print_field(self.td_max, VARIABLES[API_TD_MAX].unit)}), "
+                f"(TDmin: {self._prety_print_field(self.td_min, VARIABLES[API_TD_MIN].unit)}), "
+                f"(TG: {self._prety_print_field(self.tg, VARIABLES[API_TG].unit)}), "
+                f"(RH: {self._prety_print_field(self.rh, VARIABLES[API_RH].unit)}), "
+                f"(Rain: {self._prety_print_field(self.rain, VARIABLES[API_RAIN].unit)}), "
+                f"(WS: {self._prety_print_field(self.ws, VARIABLES[API_WS].unit)}), "
+                f"(WSmax: {self._prety_print_field(self.ws_max, VARIABLES[API_WS_MAX].unit)}), "
+                f"(WD: {self._prety_print_field(self.wd, VARIABLES[API_WD].unit)}), "
+                f"(WDmax: {self._prety_print_field(self.wd_max, VARIABLES[API_WD_MAX].unit)}), "
+                f"(STDwd: {self._prety_print_field(self.std_wd, VARIABLES[API_STD_WD].unit)}), "
+                f"(WS1mm: {self._prety_print_field(self.ws_1mm, VARIABLES[API_WS_1MM].unit)}), "
+                f"(WS10mm: {self._prety_print_field(self.ws_10mm, VARIABLES[API_WS_10MM].unit)}), "
+                f"(Time: {self._prety_print_field(self.time.strftime('%H:%M') if self.time else None, VARIABLES[API_TIME].unit)})]"
+            )
 
     def __str__(self) -> str:
         return self._pretty_print()
@@ -166,7 +159,7 @@ def _fix_datetime_offset(dt: datetime.datetime) -> tuple[datetime.datetime, bool
     # Replace the pytz tzinfo with the fixed timezone
     dt = dt.replace(tzinfo=fixed_timezone)
 
-    is_dst = dt.dst() != datetime.timedelta(0)
+    is_dst = dt.dst() and dt.dst() != datetime.timedelta(0)
     if is_dst:
         dt = dt + datetime.timedelta(hours=1)
 
@@ -203,7 +196,7 @@ def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
     if time_val:
         time_int = int(time_val)
         if time_int <= MAX_HOUR_INT:
-            t = time.strptime(str(time_int), "%H")
+            t = time.strptime(str(time_int), "%M")
         else :
             t = time.strptime(str(time_int), "%H%M")
         time_val = datetime.time(t.tm_hour, t.tm_min, tzinfo=tz)
