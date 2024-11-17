@@ -38,12 +38,14 @@ def _get_headers(token: UUID | str) -> dict[str, str]:
 def _verify_response_or_raise(response: ClientResponse) -> None:
     """Verify that the response is valid."""
     if response.status in (401, 403):
+        _LOGGER.debug("Bad Response: %s", response.text())
         msg = "Invalid credentials"
         raise ImsEnvistaApiClientAuthenticationError(
             msg,
         )
     content_type = response.headers.get("Content-Type")
     if content_type and "application/json" not in content_type:
+        _LOGGER.debug("Bad Response: %s", response.text())
         msg = f"Invalid response from IMS - bad Content-Type: {content_type}"
         raise ImsEnvistaApiClientError(
             msg,
@@ -86,9 +88,9 @@ async def get(
             msg,
         ) from exception
 
+    _LOGGER.debug("Response from %s: %s", url, json_resp)
     if response.status != http.HTTPStatus.OK:
         msg = f"Received Error from IMS Envista API from {url}: {response.status, response.reason}"
         raise ImsEnvistaApiClientError(msg)
 
-    _LOGGER.debug("Response from %s: %s", url, json_resp)
     return json_resp
