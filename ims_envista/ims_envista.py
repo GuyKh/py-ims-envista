@@ -59,7 +59,7 @@ class IMSEnvista:
             asyncio.run(self._session.close())
 
     @staticmethod
-    def _get_channel_id_url_part(channel_id: int) -> str:
+    def _get_channel_id_url_part(channel_id: int | None) -> str:
         """Get specific Channel Id url param."""
         if channel_id:
             return "/" + str(channel_id)
@@ -74,7 +74,7 @@ class IMSEnvista:
         Args:
         ----
             station_id (int): IMS Station Id
-            channel_id (int): [Optional] Specific Channel Id
+            channel_id (int | None): [Optional] Specific Channel Id
 
         Returns:
         -------
