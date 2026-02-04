@@ -29,11 +29,13 @@ class ImsEnvistaApiClientAuthenticationError(
 ):
     """Exception to indicate an authentication error."""
 
+
 def _get_headers(token: UUID | str) -> dict[str, str]:
     return {
         "Accept": "application/vnd.github.v3.text-match+json",
-        "Authorization": f"ApiToken {token!s}"
+        "Authorization": f"ApiToken {token!s}",
     }
+
 
 def _verify_response_or_raise(response: ClientResponse) -> None:
     """Verify that the response is valid."""
@@ -62,10 +64,7 @@ async def get(
     try:
         async with async_timeout.timeout(180):
             _LOGGER.debug("Sending GET from %s", url)
-            response = await session.get(
-                url=url,
-                headers=headers
-            )
+            response = await session.get(url=url, headers=headers)
             _verify_response_or_raise(response)
             json_resp = await response.json()
 

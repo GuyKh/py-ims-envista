@@ -1,4 +1,5 @@
 """Module providing IMS (Israel Meteorological Service) API wrapper for Envista."""
+
 from .commons import (
     ImsEnvistaApiClientAuthenticationError,
     ImsEnvistaApiClientCommunicationError,
@@ -13,5 +14,5 @@ __all__ = [
     "ImsEnvistaApiClientAuthenticationError",
     "ImsEnvistaApiClientCommunicationError",
     "StationMeteorologicalReadings",
-    "meteo_data_from_json"
+    "meteo_data_from_json",
 ]

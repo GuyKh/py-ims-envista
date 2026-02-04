@@ -1,4 +1,6 @@
 """Version."""
+
+
 class Version:
     """Version of the package."""
 
