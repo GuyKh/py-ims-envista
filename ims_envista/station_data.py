@@ -25,6 +25,7 @@ def location_from_json(json: dict) -> Location:
     """Convert a JSON object to a Location object."""
     return Location(json["latitude"], json["longitude"])
 
+
 @dataclass
 class Monitor:
     """Monitor."""
@@ -45,6 +46,7 @@ class Monitor:
     """Monitored Condition Units"""
     description: str
     """Monitored Condition Description"""
+
     def __repr__(self) -> str:
         return textwrap.dedent("""{}({})""").format(self.name, self.units)
 
@@ -61,6 +63,7 @@ def monitor_from_json(json: dict) -> Monitor:
         json["units"],
         json["description"],
     )
+
 
 @dataclass
 class StationInfo:
@@ -119,6 +122,7 @@ def station_from_json(json: dict) -> StationInfo:
         json["StationTarget"],
         [monitor_from_json(monitor) for monitor in json["monitors"]],
     )
+
 
 @dataclass
 class RegionInfo:
