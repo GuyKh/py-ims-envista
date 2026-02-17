@@ -18,8 +18,7 @@
 ## Components and Frameworks used
 
 * [aiohttp](https://pypi.org/project/aiohttp/)
-* [Loguru](https://pypi.org/project/loguru/)
-* [urllib3](https://pypi.org/project/urllib3/)
+* [async-timeout](https://pypi.org/project/async-timeout/)
 
 ## Installing
 
@@ -29,16 +28,17 @@ pip3 install --upgrade ims-envista
 
 ## Working with the API
 
-weatheril can be configured to retrive forecast information for specific location. when initiating the library you must set the location id and language (Currently only he and en are supported)
+Initialize the client with an IMS API token and use the async API methods to fetch station/region data.
 
 ### Getting an IMS Token
 You can read about the API and about how to get a token [here](https://ims.gov.il/en/ObservationDataAPI) - signing terms of use, etc.
 
 ```python
+import os
 from ims_envista import IMSEnvista
 
-# Create IMS object with Token
-ims = IMSEnvista("2cc57fb1-cda5-4965-af12-b397e5b8eb32")
+# Create IMS client with token from environment
+ims = IMSEnvista(os.environ["IMS_TOKEN"])
 
 # Get JERUSALEM stations for getting an id
 [station for station in await ims.get_all_stations_info() if station.name.startswith("JERUSALEM")]
@@ -83,11 +83,11 @@ await ims.get_latest_station_data(23)
 | get_station_data_by_date_range  | Get Station Readings from a date range  | station_id: int, <br>from_date: datetime, <br>to_date: datetime, <br>(optional) channel_id: int  | [StationMeteorologicalReadings](./ims_envista/meteo_data.py)  |
 | get_daily_station_data  | Get Daily Station Readings  | station_id: int, <br>(optional) channel_id: int  | [StationMeteorologicalReadings](./ims_envista/meteo_data.py)  |
 | get_monthly_station_data  | Get Monthly Station Readings  | station_id: int, <br>(optional) channel_id: int, <br>(optional) month: str, [e.g. 03]<br>(optional) year: str [e.g. 2020]  | [StationMeteorologicalReadings](./ims_envista/meteo_data.py)  |
-| get_all_stations_data  | Get Station Info of all stations  |   | list[[Station](./ims_envista/station_data.py)]  |
-| get_station_data  | Get Station Info by station_id  | station_id: int  | [Station](./ims_envista/station_data.py)  |
-| get_all_regions_data  | Get Region Info of all regions  |   | list[[Region](./ims_envista/station_data.py)]  |
+| get_all_stations_info  | Get station info for all stations  |   | list[[Station](./ims_envista/station_data.py)]  |
+| get_station_info  | Get station info by station_id  | station_id: int  | [Station](./ims_envista/station_data.py)  |
+| get_all_regions_info  | Get region info for all regions  |   | list[[Region](./ims_envista/station_data.py)]  |
 | get_region_info  | Get Region Info by region_id  | station_id: int  | [Region](./ims_envista/station_data.py)  |
-| get_metric_descriptions  | Get Station Measurements Description  |   | list[IMSVariable](./ims_envista/ims_variable.py)  |
+| get_metrics_descriptions  | Get station measurements description  |   | list[IMSVariable](./ims_envista/ims_variable.py)  |
 
 ## Local Development
 

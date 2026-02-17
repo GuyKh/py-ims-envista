@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 pytest = "*"
 pytest-cov = "*"
-loguru = "*"
 aiohttp = "*" 
 setuptools = "*"
 

@@ -1,4 +1,7 @@
 """Version."""
+__version__ = "0.0.0"
+
+
 class Version:
     """Version of the package."""
 

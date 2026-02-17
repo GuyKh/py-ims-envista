@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import asyncio
-import atexit
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 from aiohttp import ClientSession
 
@@ -47,21 +45,40 @@ class IMSEnvista:
             err_msg = "Missing IMS Token"
             raise ValueError(err_msg)
 
-        if not session:
-            session = ClientSession()
-            atexit.register(self._shutdown)
-
         self._session = session
+        self._own_session = session is None
         self._token = token
 
-    def _shutdown(self) -> None:
-        if not self._session.closed:
-            asyncio.run(self._session.close())
+    async def _get_session(self) -> ClientSession:
+        if self._session is None:
+            self._session = ClientSession()
+            self._own_session = True
+            return self._session
+
+        if self._session.closed:
+            if self._own_session:
+                self._session = ClientSession()
+                return self._session
+            msg = "Provided aiohttp session is closed"
+            raise RuntimeError(msg)
+
+        return self._session
+
+    async def close(self) -> None:
+        if self._own_session and self._session and not self._session.closed:
+            await self._session.close()
+
+    async def __aenter__(self) -> Self:
+        await self._get_session()
+        return self
+
+    async def __aexit__(self, *_: object) -> None:
+        await self.close()
 
     @staticmethod
     def _get_channel_id_url_part(channel_id: int | None) -> str:
         """Get specific Channel Id url param."""
-        if channel_id:
+        if channel_id is not None:
             return "/" + str(channel_id)
         return ""
 
@@ -84,7 +101,9 @@ class IMSEnvista:
         get_url = GET_LATEST_STATION_DATA_URL.format(
             str(station_id), self._get_channel_id_url_part(channel_id)
         )
-        return station_meteo_data_from_json(await get(session=self._session, url=get_url, token=self._token))
+        return station_meteo_data_from_json(
+            await get(session=await self._get_session(), url=get_url, token=self._token)
+        )
 
     async def get_earliest_station_data(
             self, station_id: int, channel_id: int | None = None
@@ -105,7 +124,9 @@ class IMSEnvista:
         get_url = GET_EARLIEST_STATION_DATA_URL.format(
             str(station_id), self._get_channel_id_url_part(channel_id)
         )
-        return station_meteo_data_from_json(await get(session=self._session, url=get_url, token=self._token))
+        return station_meteo_data_from_json(
+            await get(session=await self._get_session(), url=get_url, token=self._token)
+        )
 
     async def get_station_data_from_date(
             self, station_id: int, date_to_query: date, channel_id: int | None = None
@@ -131,7 +152,9 @@ class IMSEnvista:
             str(date_to_query.month),
             str(date_to_query.day),
         )
-        return station_meteo_data_from_json(await get(session=self._session, url=get_url, token=self._token))
+        return station_meteo_data_from_json(
+            await get(session=await self._get_session(), url=get_url, token=self._token)
+        )
 
     async def get_station_data_by_date_range(
             self,
@@ -165,7 +188,9 @@ class IMSEnvista:
             str(to_date.strftime("%m")),
             str(to_date.strftime("%d")),
         )
-        return station_meteo_data_from_json(await get(session=self._session, url=get_url, token=self._token))
+        return station_meteo_data_from_json(
+            await get(session=await self._get_session(), url=get_url, token=self._token)
+        )
 
     async def get_daily_station_data(
             self, station_id: int, channel_id: int | None = None
@@ -187,7 +212,9 @@ class IMSEnvista:
             str(station_id),
             self._get_channel_id_url_part(channel_id),
         )
-        return station_meteo_data_from_json(await get(session=self._session, url=get_url, token=self._token))
+        return station_meteo_data_from_json(
+            await get(session=await self._get_session(), url=get_url, token=self._token)
+        )
 
     async def get_monthly_station_data(
             self,
@@ -219,7 +246,9 @@ class IMSEnvista:
             get_url = GET_MONTHLY_STATION_DATA_BY_MONTH_URL.format(
                 str(station_id), self._get_channel_id_url_part(channel_id), year, month
             )
-        return station_meteo_data_from_json(await get(session=self._session, url=get_url, token=self._token))
+        return station_meteo_data_from_json(
+            await get(session=await self._get_session(), url=get_url, token=self._token)
+        )
 
     async def get_all_stations_info(self) -> list[StationInfo]:
         """
@@ -231,7 +260,7 @@ class IMSEnvista:
 
         """
         get_url = GET_ALL_STATIONS_DATA_URL
-        response = await get(session=self._session, url=get_url, token=self._token)
+        response = await get(session=await self._get_session(), url=get_url, token=self._token)
         return [station_from_json(station) for station in response]
 
     async def get_station_info(self, station_id: int) -> StationInfo:
@@ -248,7 +277,9 @@ class IMSEnvista:
 
         """
         get_url = GET_SPECIFIC_STATION_DATA_URL.format(str(station_id))
-        return station_from_json(await get(session=self._session, url=get_url, token=self._token))
+        return station_from_json(
+            await get(session=await self._get_session(), url=get_url, token=self._token)
+        )
 
     async def get_all_regions_info(self) -> list[RegionInfo]:
         """
@@ -260,7 +291,7 @@ class IMSEnvista:
 
         """
         get_url = GET_ALL_REGIONS_DATA_URL
-        response = await get(session=self._session, url=get_url, token=self._token)
+        response = await get(session=await self._get_session(), url=get_url, token=self._token)
         regions = []
         for region in response:
             stations = [station_from_json(station) for station in region[API_STATIONS]]
@@ -283,7 +314,7 @@ class IMSEnvista:
 
         """
         get_url = GET_SPECIFIC_REGION_DATA_URL.format(str(region_id))
-        response = await get(session=self._session, url=get_url, token=self._token)
+        response = await get(session=await self._get_session(), url=get_url, token=self._token)
         return region_from_json(response)
 
     def get_metrics_descriptions(self) -> list[IMSVariable]:

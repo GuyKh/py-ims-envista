@@ -4,7 +4,6 @@ import os
 import unittest
 from datetime import date, datetime, timedelta
 
-import pytest
 import pytz
 from aiohttp import ClientSession
 
@@ -23,7 +22,8 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
         """Do Setup."""
         self.token = os.environ.get("IMS_TOKEN")
         if not self.token:
-            pytest.fail("Failed to load IMS Token")
+            msg = "IMS_TOKEN is not set. Skipping integration test."
+            raise unittest.SkipTest(msg)
 
         self.station_id = 178  # TEL AVIV COAST station
         self.region_id = 13
@@ -79,7 +79,7 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
         assert station_data.station_id == self.station_id
         assert station_data.data is not None
         assert len(station_data.data) > 0
-        assert station_data.data[0].td > 0
+        assert station_data.data[0].td is not None
 
 
     async def test_get_latest_station_data_with_channel(self) -> None:
@@ -92,7 +92,7 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
         assert station_data.station_id == self.station_id
         assert station_data.data is not None
         assert len(station_data.data) > 0
-        assert station_data.data[0].td > 0
+        assert station_data.data[0].td is not None
 
 
     async def test_get_earliest_station_data(self) -> None:
@@ -103,7 +103,7 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
         assert station_data.station_id == self.station_id
         assert station_data.data is not None
         assert len(station_data.data) > 0
-        assert station_data.data[0].td > 0
+        assert station_data.data[0].td is not None
 
 
     async def test_get_earliest_station_data_with_channel(self) -> None:
@@ -116,7 +116,7 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
         assert station_data.station_id == self.station_id
         assert station_data.data is not None
         assert len(station_data.data) > 0
-        assert station_data.data[0].td > 0
+        assert station_data.data[0].td is not None
 
 
     async def test_get_station_data_from_date(self) -> None:
@@ -165,7 +165,7 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
         for station_reading in station_data.data:
             assert station_reading.datetime >= to_date_time(yesterday)
             assert station_reading.datetime < today
-            assert station_reading.td > 0
+            assert station_reading.td is not None
 
 
     async def test_get_station_data_by_date_range_with_channel(self) -> None:
@@ -189,7 +189,7 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
         for station_reading in station_data.data:
             assert station_reading.datetime >= to_date_time(yesterday)
             assert station_reading.datetime < today
-            assert station_reading.td > 0
+            assert station_reading.td is not None
 
 
     async def test_get_monthly_station_data(self) -> None:
@@ -207,7 +207,7 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
         for station_reading in station_data.data:
             assert station_reading.datetime.date().strftime("%Y") == year
             assert station_reading.datetime.date().strftime("%m") == month
-            assert station_reading.td > 0
+            assert station_reading.td is not None
 
 
     async def test_get_monthly_station_data_with_channel(self) -> None:
@@ -225,7 +225,7 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
         for station_reading in station_data.data:
             assert station_reading.datetime.date().strftime("%m") == month
             assert station_reading.datetime.date().strftime("%Y") == year
-            assert station_reading.td > 0
+            assert station_reading.td is not None
 
     def test_get_metrics_descriptions(self) -> None:
         metrics = self.ims.get_metrics_descriptions()

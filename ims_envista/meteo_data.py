@@ -5,10 +5,8 @@ from __future__ import annotations
 import datetime
 import logging
 import textwrap
-import time
 from dataclasses import dataclass, field
-
-import pytz
+from zoneinfo import ZoneInfo
 
 from .const import (
     API_BP,
@@ -44,6 +42,9 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 MAX_HOUR_INT = 60
+MAX_CLOCK_HOUR = 23
+MAX_CLOCK_MINUTE = 59
+TZ = ZoneInfo("Asia/Jerusalem")
 
 @dataclass
 class MeteorologicalData:
@@ -53,50 +54,50 @@ class MeteorologicalData:
     """Station ID"""
     datetime: datetime.datetime
     """Date and time of the data"""
-    rain: float
+    rain: float | None
     """Rainfall in mm"""
-    ws: float
+    ws: float | None
     """Wind speed in m/s"""
-    ws_max: float
+    ws_max: float | None
     """Gust wind speed in m/s"""
-    wd: float
+    wd: float | None
     """Wind direction in deg"""
-    wd_max: float
+    wd_max: float | None
     """Gust wind direction in deg"""
-    std_wd: float
+    std_wd: float | None
     """Standard deviation wind direction in deg"""
-    td: float
+    td: float | None
     """Temperature in °C"""
-    td_max: float
+    td_max: float | None
     """Maximum Temperature in °C"""
-    td_min: float
+    td_min: float | None
     """Minimum Temperature in °C"""
-    tg: float
+    tg: float | None
     """Ground Temperature in °C"""
-    tw: float
+    tw: float | None
     """TW Temperature (?) in °C"""
-    rh: float
+    rh: float | None
     """Relative humidity in %"""
-    ws_1mm: float
+    ws_1mm: float | None
     """Maximum 1 minute wind speed in m/s"""
-    ws_10mm: float
+    ws_10mm: float | None
     """Maximum 10 minute wind speed in m/s"""
-    time: datetime.time
+    time: datetime.time | None
     """Time"""
-    bp: float
+    bp: float | None
     """Maximum barometric pressure in mb"""
-    diff_r: float
+    diff_r: float | None
     """Distributed radiation in w/m^2"""
-    grad: float
+    grad: float | None
     """Global radiation in w/m^2"""
-    nip: float
+    nip: float | None
     """Direct radiation in w/m^2"""
-    rain_1_min: float
+    rain_1_min: float | None
     """Rainfall per minute in mm"""
 
     def _prety_print_field(self, value: float | str | None, unit: str | None) -> str:
         """Pretty Print a specific field."""
-        if value:
+        if value is not None:
             return f"{value!s}{unit if unit else ''}"
         return "None"
 
@@ -143,33 +144,34 @@ class StationMeteorologicalReadings:
             self.station_id, self.data
         )
 
-tz = pytz.timezone("Asia/Jerusalem")
+def _fix_datetime_offset(dt: datetime.datetime) -> datetime.datetime:
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=TZ)
+    return dt.astimezone(TZ)
 
 
-def _fix_datetime_offset(dt: datetime.datetime) -> tuple[datetime.datetime, bool]:
-    dt = dt.replace(tzinfo=None)
-    dt = tz.localize(dt)
+def _parse_time_value(raw_time: float | None) -> datetime.time | None:
+    if raw_time is None:
+        return None
 
-    # Get the UTC offset in seconds
-    offset_seconds = dt.utcoffset().total_seconds()
+    time_int = int(raw_time)
+    if time_int <= MAX_HOUR_INT:
+        return datetime.time(0, time_int, tzinfo=TZ)
 
-    # Create a fixed timezone with the same offset and name
-    fixed_timezone = datetime.timezone(datetime.timedelta(seconds=offset_seconds), dt.tzname())
+    time_str = f"{time_int:04d}"
+    hour = int(time_str[:2])
+    minute = int(time_str[2:])
+    if hour > MAX_CLOCK_HOUR or minute > MAX_CLOCK_MINUTE:
+        _LOGGER.debug("Invalid API time format: %s", raw_time)
+        return None
 
-    # Replace the pytz tzinfo with the fixed timezone
-    dt = dt.replace(tzinfo=fixed_timezone)
-
-    is_dst = dt.dst() and dt.dst() != datetime.timedelta(0)
-    if is_dst:
-        dt = dt + datetime.timedelta(hours=1)
-
-    return dt,is_dst
+    return datetime.time(hour, minute, tzinfo=TZ)
 
 
 def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
     """Create a MeteorologicalData object from a JSON object."""
     dt = datetime.datetime.fromisoformat(data[API_DATETIME])
-    dt, is_dst = _fix_datetime_offset(dt)
+    dt = _fix_datetime_offset(dt)
 
     channel_value_dict = {}
     for channel_value in data[API_CHANNELS]:
@@ -192,24 +194,12 @@ def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
     ws_10mm = channel_value_dict.get(API_WS_10MM)
     tg = channel_value_dict.get(API_TG)
     tw = channel_value_dict.get(API_TW)
-    time_val = channel_value_dict.get(API_TIME)
-    if time_val:
-        time_int = int(time_val)
-        if time_int <= MAX_HOUR_INT:
-            t = time.strptime(str(time_int), "%M")
-        else :
-            t = time.strptime(str(time_int), "%H%M")
-        time_val = datetime.time(t.tm_hour, t.tm_min, tzinfo=tz)
+    time_val = _parse_time_value(channel_value_dict.get(API_TIME))
     bp = channel_value_dict.get(API_BP)
     diff_r = channel_value_dict.get(API_DIFF)
     grad = channel_value_dict.get(API_GRAD)
     nip = channel_value_dict.get(API_NIP)
     rain_1_min = channel_value_dict.get(API_RAIN_1_MIN)
-
-    if is_dst and time_val:
-        # Strange IMS logic :o
-        dt = dt + datetime.timedelta(hours=1)
-        time_val = time_val.replace(hour=(time_val.hour+1)%24)
 
     return MeteorologicalData(
         station_id=station_id,
@@ -237,10 +227,8 @@ def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
     )
 
 
-def station_meteo_data_from_json(json: dict) -> StationMeteorologicalReadings | None:
+def station_meteo_data_from_json(json: dict) -> StationMeteorologicalReadings:
     station_id = int(json[API_STATION_ID])
-    data = json.get(API_DATA)
-    if not data:
-        return None
+    data = json.get(API_DATA) or []
     meteo_data = [meteo_data_from_json(station_id, single_meteo_data) for single_meteo_data in data]
     return StationMeteorologicalReadings(station_id, meteo_data)

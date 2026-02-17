@@ -1,7 +1,6 @@
 pytest
 pytest-cov
 pytest-asyncio
-loguru
 async_timeout
 pytz
 ruff>=0.9.9
