@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Self
 
-from aiohttp import ClientSession
+from aiohttp import ClientSession, TCPConnector, ThreadedResolver
 
 from .commons import get
 from .const import (
@@ -40,6 +40,12 @@ if TYPE_CHECKING:
 class IMSEnvista:
     """API Wrapper to IMS Envista."""
 
+    @staticmethod
+    def _create_session() -> ClientSession:
+        """Create internal aiohttp session with a resolver that works on Python 3.12."""
+        connector = TCPConnector(resolver=ThreadedResolver())
+        return ClientSession(connector=connector)
+
     def __init__(self, token: UUID | str, session: ClientSession | None = None) -> None:
         if not token:
             err_msg = "Missing IMS Token"
@@ -51,13 +57,13 @@ class IMSEnvista:
 
     async def _get_session(self) -> ClientSession:
         if self._session is None:
-            self._session = ClientSession()
+            self._session = self._create_session()
             self._own_session = True
             return self._session
 
         if self._session.closed:
             if self._own_session:
-                self._session = ClientSession()
+                self._session = self._create_session()
                 return self._session
             msg = "Provided aiohttp session is closed"
             raise RuntimeError(msg)

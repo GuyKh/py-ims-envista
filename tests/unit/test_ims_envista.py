@@ -5,7 +5,6 @@ import unittest
 from datetime import date, datetime, timedelta
 
 import pytz
-from aiohttp import ClientSession
 
 from ims_envista import IMSEnvista
 
@@ -29,14 +28,12 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
         self.region_id = 13
         self.channel_id = 7  # TD = Temperature Channel
 
-        # Initialize the session in an async context
-        self.session = ClientSession()
         self.tz = pytz.timezone("Asia/Jerusalem")
-        self.ims = IMSEnvista(self.token, session=self.session)
+        self.ims = IMSEnvista(self.token)
 
     async def asyncTearDown(self) -> None:
         """Tear Down."""
-        await self.session.close()
+        await self.ims.close()
 
 
     async def test_get_all_regions_info(self) -> None:

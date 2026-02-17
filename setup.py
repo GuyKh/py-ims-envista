@@ -3,13 +3,11 @@ from pathlib import Path
 
 import setuptools
 
-from ims_envista.version import __version__
-
 # Read the README file content using pathlib and a context manager
 long_description = Path("README.md").read_text(encoding="utf-8").strip()
 
 setuptools.setup(name="ims_envista",
-                 version=__version__,
+                 version="0.0.0",
                  long_description_content_type="text/markdown",
                  description="Israel Meteorological Service Envista API wrapper package",
                  long_description=long_description,

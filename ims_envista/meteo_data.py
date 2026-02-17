@@ -8,6 +8,8 @@ import textwrap
 from dataclasses import dataclass, field
 from zoneinfo import ZoneInfo
 
+import pytz
+
 from .const import (
     API_BP,
     API_CHANNELS,
@@ -45,6 +47,7 @@ MAX_HOUR_INT = 60
 MAX_CLOCK_HOUR = 23
 MAX_CLOCK_MINUTE = 59
 TZ = ZoneInfo("Asia/Jerusalem")
+tz = pytz.timezone("Asia/Jerusalem")
 
 @dataclass
 class MeteorologicalData:
@@ -144,10 +147,24 @@ class StationMeteorologicalReadings:
             self.station_id, self.data
         )
 
-def _fix_datetime_offset(dt: datetime.datetime) -> datetime.datetime:
-    if dt.tzinfo is None:
-        return dt.replace(tzinfo=TZ)
-    return dt.astimezone(TZ)
+def _fix_datetime_offset(dt: datetime.datetime) -> tuple[datetime.datetime, bool]:
+    dt = dt.replace(tzinfo=None)
+    dt = tz.localize(dt)
+
+    # Get the UTC offset in seconds
+    offset_seconds = dt.utcoffset().total_seconds()
+
+    # Create a fixed timezone with the same offset and name
+    fixed_timezone = datetime.timezone(datetime.timedelta(seconds=offset_seconds), dt.tzname())
+
+    # Replace the pytz tzinfo with the fixed timezone
+    dt = dt.replace(tzinfo=fixed_timezone)
+
+    is_dst = dt.dst() and dt.dst() != datetime.timedelta(0)
+    if is_dst:
+        dt = dt + datetime.timedelta(hours=1)
+
+    return dt, is_dst
 
 
 def _parse_time_value(raw_time: float | None) -> datetime.time | None:
@@ -171,7 +188,7 @@ def _parse_time_value(raw_time: float | None) -> datetime.time | None:
 def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
     """Create a MeteorologicalData object from a JSON object."""
     dt = datetime.datetime.fromisoformat(data[API_DATETIME])
-    dt = _fix_datetime_offset(dt)
+    dt, is_dst = _fix_datetime_offset(dt)
 
     channel_value_dict = {}
     for channel_value in data[API_CHANNELS]:
@@ -200,6 +217,11 @@ def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
     grad = channel_value_dict.get(API_GRAD)
     nip = channel_value_dict.get(API_NIP)
     rain_1_min = channel_value_dict.get(API_RAIN_1_MIN)
+
+    if is_dst and time_val:
+        # Strange IMS logic :o
+        dt = dt + datetime.timedelta(hours=1)
+        time_val = time_val.replace(hour=(time_val.hour + 1) % 24)
 
     return MeteorologicalData(
         station_id=station_id,
