@@ -9,9 +9,9 @@ from .meteo_data import StationMeteorologicalReadings, meteo_data_from_json
 
 __all__ = [
     "IMSEnvista",
-    "ImsEnvistaApiClientError",
     "ImsEnvistaApiClientAuthenticationError",
     "ImsEnvistaApiClientCommunicationError",
+    "ImsEnvistaApiClientError",
     "StationMeteorologicalReadings",
-    "meteo_data_from_json"
+    "meteo_data_from_json",
 ]

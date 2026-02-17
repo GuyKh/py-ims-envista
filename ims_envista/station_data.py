@@ -116,7 +116,7 @@ def station_from_json(json: dict) -> StationInfo:
         json["active"],
         json["owner"],
         json["regionId"],
-        json["StationTarget"],
+        json.get("StationTarget") or json.get("stationTarget", ""),
         [monitor_from_json(monitor) for monitor in json["monitors"]],
     )
 
