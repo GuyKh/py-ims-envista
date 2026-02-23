@@ -35,14 +35,12 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
         """Tear Down."""
         await self.ims.close()
 
-
     async def test_get_all_regions_info(self) -> None:
         """Test get_all_regions_info endpoint."""
         regions = await self.ims.get_all_regions_info()
 
         assert regions is not None
         assert len(regions) > 0
-
 
     async def test_get_region_info(self) -> None:
         """Test get_regions_info endpoint."""
@@ -51,7 +49,6 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
         assert region is not None
         assert region.region_id == self.region_id
 
-
     async def test_get_all_stations_info(self) -> None:
         """Test get_all_stations_info endpoint."""
         stations = await self.ims.get_all_stations_info()
@@ -59,14 +56,12 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
         assert stations is not None
         assert len(stations) > 0
 
-
     async def test_get_station_info(self) -> None:
         """Test get_region_info endpoint."""
         station = await self.ims.get_station_info(self.station_id)
 
         assert station is not None
         assert station.station_id == self.station_id
-
 
     async def test_get_latest_station_data(self) -> None:
         """Test get_latest_station endpoint."""
@@ -77,7 +72,6 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
         assert station_data.data is not None
         assert len(station_data.data) > 0
         assert station_data.data[0].td is not None
-
 
     async def test_get_latest_station_data_with_channel(self) -> None:
         """Test get_latest_station_data endpoint with channel."""
@@ -91,7 +85,6 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
         assert len(station_data.data) > 0
         assert station_data.data[0].td is not None
 
-
     async def test_get_earliest_station_data(self) -> None:
         """Test get_earliest_station_data endpoint."""
         station_data = await self.ims.get_earliest_station_data(self.station_id)
@@ -101,7 +94,6 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
         assert station_data.data is not None
         assert len(station_data.data) > 0
         assert station_data.data[0].td is not None
-
 
     async def test_get_earliest_station_data_with_channel(self) -> None:
         """Test get_earliest_station_data endpoint with channel."""
@@ -115,7 +107,6 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
         assert len(station_data.data) > 0
         assert station_data.data[0].td is not None
 
-
     async def test_get_station_data_from_date(self) -> None:
         """Test get_station_data_from_date endpoint."""
         station_data = await self.ims.get_station_data_from_date(
@@ -127,8 +118,10 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
         assert station_data.data is not None
         assert len(station_data.data) > 0
         for station_reading in station_data.data:
-            assert station_reading.datetime.date() == self.tz.localize(datetime.now()).date()
-
+            assert (
+                station_reading.datetime.date()
+                == self.tz.localize(datetime.now()).date()
+            )
 
     async def test_get_station_data_from_date_with_channel(self) -> None:
         """Test get_station_data_from_date endpoint with channel."""
@@ -141,8 +134,10 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
         assert station_data.data is not None
         assert len(station_data.data) > 0
         for station_reading in station_data.data:
-            assert station_reading.datetime.date() == self.tz.localize(datetime.now()).date()
-
+            assert (
+                station_reading.datetime.date()
+                == self.tz.localize(datetime.now()).date()
+            )
 
     async def test_get_station_data_by_date_range(self) -> None:
         """Test get_station_data_by_date_range endpoint."""
@@ -163,7 +158,6 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
             assert station_reading.datetime >= to_date_time(yesterday)
             assert station_reading.datetime < today
             assert station_reading.td is not None
-
 
     async def test_get_station_data_by_date_range_with_channel(self) -> None:
         """Test get_station_data_by_date_range endpoint with channel."""
@@ -188,7 +182,6 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
             assert station_reading.datetime < today
             assert station_reading.td is not None
 
-
     async def test_get_monthly_station_data(self) -> None:
         """Test get_monthly_station_data endpoint."""
         year = self.tz.localize(datetime.now()).strftime("%Y")
@@ -205,7 +198,6 @@ class TestIMSEnvista(unittest.IsolatedAsyncioTestCase):
             assert station_reading.datetime.date().strftime("%Y") == year
             assert station_reading.datetime.date().strftime("%m") == month
             assert station_reading.td is not None
-
 
     async def test_get_monthly_station_data_with_channel(self) -> None:
         """Test get_monthly_station_data endpoint with channel."""

@@ -28,11 +28,13 @@ class ImsEnvistaApiClientAuthenticationError(
 ):
     """Exception to indicate an authentication error."""
 
+
 def _get_headers(token: UUID | str) -> dict[str, str]:
     return {
         "Accept": "application/json",
         "Authorization": f"ApiToken {token!s}",
     }
+
 
 async def _verify_response_or_raise(response: ClientResponse) -> None:
     """Verify that the response is valid."""

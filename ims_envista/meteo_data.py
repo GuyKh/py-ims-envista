@@ -49,6 +49,7 @@ MAX_CLOCK_MINUTE = 59
 TZ = ZoneInfo("Asia/Jerusalem")
 tz = pytz.timezone("Asia/Jerusalem")
 
+
 @dataclass
 class MeteorologicalData:
     """Meteorological Data."""
@@ -107,24 +108,24 @@ class MeteorologicalData:
     def _pretty_print(self) -> str:
         """Pretty Print."""
         return (
-                f"StationID: {self._prety_print_field(self.station_id, None)}, "
-                f"Date: {self._prety_print_field(self.datetime, None)}, "
-                f"Readings: ["
-                f"(TD: {self._prety_print_field(self.td, VARIABLES[API_TD].unit)}), "
-                f"(TDmax: {self._prety_print_field(self.td_max, VARIABLES[API_TD_MAX].unit)}), "
-                f"(TDmin: {self._prety_print_field(self.td_min, VARIABLES[API_TD_MIN].unit)}), "
-                f"(TG: {self._prety_print_field(self.tg, VARIABLES[API_TG].unit)}), "
-                f"(RH: {self._prety_print_field(self.rh, VARIABLES[API_RH].unit)}), "
-                f"(Rain: {self._prety_print_field(self.rain, VARIABLES[API_RAIN].unit)}), "
-                f"(WS: {self._prety_print_field(self.ws, VARIABLES[API_WS].unit)}), "
-                f"(WSmax: {self._prety_print_field(self.ws_max, VARIABLES[API_WS_MAX].unit)}), "
-                f"(WD: {self._prety_print_field(self.wd, VARIABLES[API_WD].unit)}), "
-                f"(WDmax: {self._prety_print_field(self.wd_max, VARIABLES[API_WD_MAX].unit)}), "
-                f"(STDwd: {self._prety_print_field(self.std_wd, VARIABLES[API_STD_WD].unit)}), "
-                f"(WS1mm: {self._prety_print_field(self.ws_1mm, VARIABLES[API_WS_1MM].unit)}), "
-                f"(WS10mm: {self._prety_print_field(self.ws_10mm, VARIABLES[API_WS_10MM].unit)}), "
-                f"(Time: {self._prety_print_field(self.time.strftime('%H:%M') if self.time else None, VARIABLES[API_TIME].unit)})]"
-            )
+            f"StationID: {self._prety_print_field(self.station_id, None)}, "
+            f"Date: {self._prety_print_field(self.datetime, None)}, "
+            f"Readings: ["
+            f"(TD: {self._prety_print_field(self.td, VARIABLES[API_TD].unit)}), "
+            f"(TDmax: {self._prety_print_field(self.td_max, VARIABLES[API_TD_MAX].unit)}), "
+            f"(TDmin: {self._prety_print_field(self.td_min, VARIABLES[API_TD_MIN].unit)}), "
+            f"(TG: {self._prety_print_field(self.tg, VARIABLES[API_TG].unit)}), "
+            f"(RH: {self._prety_print_field(self.rh, VARIABLES[API_RH].unit)}), "
+            f"(Rain: {self._prety_print_field(self.rain, VARIABLES[API_RAIN].unit)}), "
+            f"(WS: {self._prety_print_field(self.ws, VARIABLES[API_WS].unit)}), "
+            f"(WSmax: {self._prety_print_field(self.ws_max, VARIABLES[API_WS_MAX].unit)}), "
+            f"(WD: {self._prety_print_field(self.wd, VARIABLES[API_WD].unit)}), "
+            f"(WDmax: {self._prety_print_field(self.wd_max, VARIABLES[API_WD_MAX].unit)}), "
+            f"(STDwd: {self._prety_print_field(self.std_wd, VARIABLES[API_STD_WD].unit)}), "
+            f"(WS1mm: {self._prety_print_field(self.ws_1mm, VARIABLES[API_WS_1MM].unit)}), "
+            f"(WS10mm: {self._prety_print_field(self.ws_10mm, VARIABLES[API_WS_10MM].unit)}), "
+            f"(Time: {self._prety_print_field(self.time.strftime('%H:%M') if self.time else None, VARIABLES[API_TIME].unit)})]"
+        )
 
     def __str__(self) -> str:
         return self._pretty_print()
@@ -147,6 +148,7 @@ class StationMeteorologicalReadings:
             self.station_id, self.data
         )
 
+
 def _fix_datetime_offset(dt: datetime.datetime) -> tuple[datetime.datetime, bool]:
     dt = dt.replace(tzinfo=None)
     dt = tz.localize(dt)
@@ -155,7 +157,9 @@ def _fix_datetime_offset(dt: datetime.datetime) -> tuple[datetime.datetime, bool
     offset_seconds = dt.utcoffset().total_seconds()
 
     # Create a fixed timezone with the same offset and name
-    fixed_timezone = datetime.timezone(datetime.timedelta(seconds=offset_seconds), dt.tzname())
+    fixed_timezone = datetime.timezone(
+        datetime.timedelta(seconds=offset_seconds), dt.tzname()
+    )
 
     # Replace the pytz tzinfo with the fixed timezone
     dt = dt.replace(tzinfo=fixed_timezone)
@@ -245,12 +249,15 @@ def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
         diff_r=diff_r,
         grad=grad,
         nip=nip,
-        rain_1_min=rain_1_min
+        rain_1_min=rain_1_min,
     )
 
 
 def station_meteo_data_from_json(json: dict) -> StationMeteorologicalReadings:
     station_id = int(json[API_STATION_ID])
     data = json.get(API_DATA) or []
-    meteo_data = [meteo_data_from_json(station_id, single_meteo_data) for single_meteo_data in data]
+    meteo_data = [
+        meteo_data_from_json(station_id, single_meteo_data)
+        for single_meteo_data in data
+    ]
     return StationMeteorologicalReadings(station_id, meteo_data)
