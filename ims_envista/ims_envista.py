@@ -89,8 +89,8 @@ class IMSEnvista:
         return ""
 
     async def get_latest_station_data(
-            self, station_id: int, channel_id: int | None = None
-        ) -> StationMeteorologicalReadings:
+        self, station_id: int, channel_id: int | None = None
+    ) -> StationMeteorologicalReadings:
         """
         Fetch the latest station data from IMS Envista API.
 
@@ -112,8 +112,8 @@ class IMSEnvista:
         )
 
     async def get_earliest_station_data(
-            self, station_id: int, channel_id: int | None = None
-        ) -> StationMeteorologicalReadings:
+        self, station_id: int, channel_id: int | None = None
+    ) -> StationMeteorologicalReadings:
         """
         Fetch the earliest station data from IMS Envista API.
 
@@ -135,8 +135,8 @@ class IMSEnvista:
         )
 
     async def get_station_data_from_date(
-            self, station_id: int, date_to_query: date, channel_id: int | None = None
-        ) -> StationMeteorologicalReadings:
+        self, station_id: int, date_to_query: date, channel_id: int | None = None
+    ) -> StationMeteorologicalReadings:
         """
         Fetch latest station data from IMS Envista API by date.
 
@@ -163,12 +163,12 @@ class IMSEnvista:
         )
 
     async def get_station_data_by_date_range(
-            self,
-            station_id: int,
-            from_date: date,
-            to_date: date,
-            channel_id: int | None = None,
-        ) -> StationMeteorologicalReadings:
+        self,
+        station_id: int,
+        from_date: date,
+        to_date: date,
+        channel_id: int | None = None,
+    ) -> StationMeteorologicalReadings:
         """
         Fetch latest station data from IMS Envista API by date range.
 
@@ -199,8 +199,8 @@ class IMSEnvista:
         )
 
     async def get_daily_station_data(
-            self, station_id: int, channel_id: int | None = None
-        ) -> StationMeteorologicalReadings:
+        self, station_id: int, channel_id: int | None = None
+    ) -> StationMeteorologicalReadings:
         """
         Fetch the daily station data from IMS Envista API.
 
@@ -223,12 +223,12 @@ class IMSEnvista:
         )
 
     async def get_monthly_station_data(
-            self,
-            station_id: int,
-            channel_id: int | None = None,
-            month: str | None = None,
-            year: str | None = None,
-        ) -> StationMeteorologicalReadings:
+        self,
+        station_id: int,
+        channel_id: int | None = None,
+        month: str | None = None,
+        year: str | None = None,
+    ) -> StationMeteorologicalReadings:
         """
         Fetch monthly station data from IMS Envista API.
 
@@ -266,7 +266,9 @@ class IMSEnvista:
 
         """
         get_url = GET_ALL_STATIONS_DATA_URL
-        response = await get(session=await self._get_session(), url=get_url, token=self._token)
+        response = await get(
+            session=await self._get_session(), url=get_url, token=self._token
+        )
         return [station_from_json(station) for station in response]
 
     async def get_station_info(self, station_id: int) -> StationInfo:
@@ -297,7 +299,9 @@ class IMSEnvista:
 
         """
         get_url = GET_ALL_REGIONS_DATA_URL
-        response = await get(session=await self._get_session(), url=get_url, token=self._token)
+        response = await get(
+            session=await self._get_session(), url=get_url, token=self._token
+        )
         regions = []
         for region in response:
             stations = [station_from_json(station) for station in region[API_STATIONS]]
@@ -320,7 +324,9 @@ class IMSEnvista:
 
         """
         get_url = GET_SPECIFIC_REGION_DATA_URL.format(str(region_id))
-        response = await get(session=await self._get_session(), url=get_url, token=self._token)
+        response = await get(
+            session=await self._get_session(), url=get_url, token=self._token
+        )
         return region_from_json(response)
 
     def get_metrics_descriptions(self) -> list[IMSVariable]:
