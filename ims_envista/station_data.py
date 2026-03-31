@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import textwrap
 from dataclasses import dataclass, field
 
 
@@ -16,14 +15,13 @@ class Location:
     """Longitude"""
 
     def __repr__(self) -> str:
-        return textwrap.dedent("""[Lat-{}/Long-{}]""").format(
-            self.latitude, self.longitude
-        )
+        return f"[Lat-{self.latitude}/Long-{self.longitude}]"
 
 
 def location_from_json(json: dict) -> Location:
     """Convert a JSON object to a Location object."""
     return Location(json["latitude"], json["longitude"])
+
 
 @dataclass
 class Monitor:
@@ -45,8 +43,9 @@ class Monitor:
     """Monitored Condition Units"""
     description: str
     """Monitored Condition Description"""
+
     def __repr__(self) -> str:
-        return textwrap.dedent("""{}({})""").format(self.name, self.units)
+        return f"{self.name}({self.units})"
 
 
 def monitor_from_json(json: dict) -> Monitor:
@@ -61,6 +60,7 @@ def monitor_from_json(json: dict) -> Monitor:
         json["units"],
         json["description"],
     )
+
 
 @dataclass
 class StationInfo:
@@ -90,18 +90,8 @@ class StationInfo:
     """List of Monitored Conditions"""
 
     def __repr__(self) -> str:
-        return textwrap.dedent(
-            """{} ({}) - Location: {}, {}ctive, Owner: {}, RegionId: {}, Monitors: {}, StationTarget: {}"""
-        ).format(
-            self.name,
-            self.station_id,
-            self.location,
-            ("A" if self.active else "Ina"),
-            self.owner,
-            self.region_id,
-            self.monitors,
-            self.station_target,
-        )
+        active_str = "A" if self.active else "Ina"
+        return f"{self.name} ({self.station_id}) - Location: {self.location}, {active_str}ctive, Owner: {self.owner}, RegionId: {self.region_id}, Monitors: {self.monitors}, StationTarget: {self.station_target}"
 
 
 def station_from_json(json: dict) -> StationInfo:
@@ -120,6 +110,7 @@ def station_from_json(json: dict) -> StationInfo:
         [monitor_from_json(monitor) for monitor in json["monitors"]],
     )
 
+
 @dataclass
 class RegionInfo:
     """Region Information."""
@@ -132,9 +123,7 @@ class RegionInfo:
     """List of Stations in the Region"""
 
     def __repr__(self) -> str:
-        return textwrap.dedent("""{}({}), Stations: {}""").format(
-            self.name, self.region_id, self.stations
-        )
+        return f"{self.name}({self.region_id}), Stations: {self.stations}"
 
 
 def region_from_json(json: dict) -> RegionInfo:

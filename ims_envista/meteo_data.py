@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-import datetime
 import logging
-import textwrap
 from dataclasses import dataclass, field
+from datetime import datetime, time, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 import pytz
@@ -43,11 +42,12 @@ from .const import (
 )
 
 _LOGGER = logging.getLogger(__name__)
-MAX_HOUR_INT = 60
+MAX_MINUTE_VALUE = 60
 MAX_CLOCK_HOUR = 23
 MAX_CLOCK_MINUTE = 59
 TZ = ZoneInfo("Asia/Jerusalem")
 tz = pytz.timezone("Asia/Jerusalem")
+
 
 @dataclass
 class MeteorologicalData:
@@ -55,7 +55,7 @@ class MeteorologicalData:
 
     station_id: int
     """Station ID"""
-    datetime: datetime.datetime
+    datetime: datetime
     """Date and time of the data"""
     rain: float | None
     """Rainfall in mm"""
@@ -85,7 +85,7 @@ class MeteorologicalData:
     """Maximum 1 minute wind speed in m/s"""
     ws_10mm: float | None
     """Maximum 10 minute wind speed in m/s"""
-    time: datetime.time | None
+    time: time | None
     """Time"""
     bp: float | None
     """Maximum barometric pressure in mb"""
@@ -98,33 +98,35 @@ class MeteorologicalData:
     rain_1_min: float | None
     """Rainfall per minute in mm"""
 
-    def _prety_print_field(self, value: float | str | None, unit: str | None) -> str:
+    def _pretty_print_field(
+        self, value: float | str | int | datetime | None, unit: str | None
+    ) -> str:
         """Pretty Print a specific field."""
         if value is not None:
-            return f"{value!s}{unit if unit else ''}"
+            return f"{value!s}{unit or ''}"
         return "None"
 
     def _pretty_print(self) -> str:
         """Pretty Print."""
         return (
-                f"StationID: {self._prety_print_field(self.station_id, None)}, "
-                f"Date: {self._prety_print_field(self.datetime, None)}, "
-                f"Readings: ["
-                f"(TD: {self._prety_print_field(self.td, VARIABLES[API_TD].unit)}), "
-                f"(TDmax: {self._prety_print_field(self.td_max, VARIABLES[API_TD_MAX].unit)}), "
-                f"(TDmin: {self._prety_print_field(self.td_min, VARIABLES[API_TD_MIN].unit)}), "
-                f"(TG: {self._prety_print_field(self.tg, VARIABLES[API_TG].unit)}), "
-                f"(RH: {self._prety_print_field(self.rh, VARIABLES[API_RH].unit)}), "
-                f"(Rain: {self._prety_print_field(self.rain, VARIABLES[API_RAIN].unit)}), "
-                f"(WS: {self._prety_print_field(self.ws, VARIABLES[API_WS].unit)}), "
-                f"(WSmax: {self._prety_print_field(self.ws_max, VARIABLES[API_WS_MAX].unit)}), "
-                f"(WD: {self._prety_print_field(self.wd, VARIABLES[API_WD].unit)}), "
-                f"(WDmax: {self._prety_print_field(self.wd_max, VARIABLES[API_WD_MAX].unit)}), "
-                f"(STDwd: {self._prety_print_field(self.std_wd, VARIABLES[API_STD_WD].unit)}), "
-                f"(WS1mm: {self._prety_print_field(self.ws_1mm, VARIABLES[API_WS_1MM].unit)}), "
-                f"(WS10mm: {self._prety_print_field(self.ws_10mm, VARIABLES[API_WS_10MM].unit)}), "
-                f"(Time: {self._prety_print_field(self.time.strftime('%H:%M') if self.time else None, VARIABLES[API_TIME].unit)})]"
-            )
+            f"StationID: {self._pretty_print_field(self.station_id, None)}, "
+            f"Date: {self._pretty_print_field(self.datetime, None)}, "
+            f"Readings: ["
+            f"(TD: {self._pretty_print_field(self.td, VARIABLES[API_TD].unit)}), "
+            f"(TDmax: {self._pretty_print_field(self.td_max, VARIABLES[API_TD_MAX].unit)}), "
+            f"(TDmin: {self._pretty_print_field(self.td_min, VARIABLES[API_TD_MIN].unit)}), "
+            f"(TG: {self._pretty_print_field(self.tg, VARIABLES[API_TG].unit)}), "
+            f"(RH: {self._pretty_print_field(self.rh, VARIABLES[API_RH].unit)}), "
+            f"(Rain: {self._pretty_print_field(self.rain, VARIABLES[API_RAIN].unit)}), "
+            f"(WS: {self._pretty_print_field(self.ws, VARIABLES[API_WS].unit)}), "
+            f"(WSmax: {self._pretty_print_field(self.ws_max, VARIABLES[API_WS_MAX].unit)}), "
+            f"(WD: {self._pretty_print_field(self.wd, VARIABLES[API_WD].unit)}), "
+            f"(WDmax: {self._pretty_print_field(self.wd_max, VARIABLES[API_WD_MAX].unit)}), "
+            f"(STDwd: {self._pretty_print_field(self.std_wd, VARIABLES[API_STD_WD].unit)}), "
+            f"(WS1mm: {self._pretty_print_field(self.ws_1mm, VARIABLES[API_WS_1MM].unit)}), "
+            f"(WS10mm: {self._pretty_print_field(self.ws_10mm, VARIABLES[API_WS_10MM].unit)}), "
+            f"(Time: {self._pretty_print_field(self.time.strftime('%H:%M') if self.time else None, VARIABLES[API_TIME].unit)})]"
+        )
 
     def __str__(self) -> str:
         return self._pretty_print()
@@ -143,37 +145,55 @@ class StationMeteorologicalReadings:
     """ List of Meteorological Data """
 
     def __repr__(self) -> str:
-        return textwrap.dedent("""Station ({}), Data: {}""").format(
-            self.station_id, self.data
-        )
+        return f"Station ({self.station_id}), Data: {self.data}"
 
-def _fix_datetime_offset(dt: datetime.datetime) -> tuple[datetime.datetime, bool]:
+
+def _fix_datetime_offset(dt: datetime) -> tuple[datetime, bool]:
+    """
+    Fix datetime offset and handle DST adjustments for Jerusalem timezone.
+
+    Converts a naive datetime to Jerusalem timezone and adjusts for DST.
+    The IMS API has special DST handling that requires an additional hour shift.
+
+    Args:
+        dt: Naive datetime object to fix
+
+    Returns:
+        Tuple of (adjusted datetime, is_dst flag)
+
+    """
     dt = dt.replace(tzinfo=None)
     dt = tz.localize(dt)
 
     # Get the UTC offset in seconds
-    offset_seconds = dt.utcoffset().total_seconds()
+    offset = dt.utcoffset()
+    if offset is None:
+        offset_seconds = 0
+    else:
+        offset_seconds = offset.total_seconds()
 
     # Create a fixed timezone with the same offset and name
-    fixed_timezone = datetime.timezone(datetime.timedelta(seconds=offset_seconds), dt.tzname())
+    tz_name = dt.tzname() or "UTC"
+    fixed_timezone = timezone(timedelta(seconds=offset_seconds), tz_name)
 
     # Replace the pytz tzinfo with the fixed timezone
     dt = dt.replace(tzinfo=fixed_timezone)
 
-    is_dst = dt.dst() and dt.dst() != datetime.timedelta(0)
+    dst_offset = dt.dst()
+    is_dst = bool(dst_offset)
     if is_dst:
         dt = dt + datetime.timedelta(hours=1)
 
     return dt, is_dst
 
 
-def _parse_time_value(raw_time: float | None) -> datetime.time | None:
+def _parse_time_value(raw_time: float | None) -> time | None:
     if raw_time is None:
         return None
 
     time_int = int(raw_time)
-    if time_int <= MAX_HOUR_INT:
-        return datetime.time(0, time_int, tzinfo=TZ)
+    if time_int <= MAX_MINUTE_VALUE:
+        return time(0, time_int, tzinfo=TZ)
 
     time_str = f"{time_int:04d}"
     hour = int(time_str[:2])
@@ -182,12 +202,12 @@ def _parse_time_value(raw_time: float | None) -> datetime.time | None:
         _LOGGER.debug("Invalid API time format: %s", raw_time)
         return None
 
-    return datetime.time(hour, minute, tzinfo=TZ)
+    return time(hour, minute, tzinfo=TZ)
 
 
 def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
     """Create a MeteorologicalData object from a JSON object."""
-    dt = datetime.datetime.fromisoformat(data[API_DATETIME])
+    dt = datetime.fromisoformat(data[API_DATETIME])
     dt, is_dst = _fix_datetime_offset(dt)
 
     channel_value_dict = {}
@@ -245,12 +265,15 @@ def meteo_data_from_json(station_id: int, data: dict) -> MeteorologicalData:
         diff_r=diff_r,
         grad=grad,
         nip=nip,
-        rain_1_min=rain_1_min
+        rain_1_min=rain_1_min,
     )
 
 
 def station_meteo_data_from_json(json: dict) -> StationMeteorologicalReadings:
     station_id = int(json[API_STATION_ID])
     data = json.get(API_DATA) or []
-    meteo_data = [meteo_data_from_json(station_id, single_meteo_data) for single_meteo_data in data]
+    meteo_data = [
+        meteo_data_from_json(station_id, single_meteo_data)
+        for single_meteo_data in data
+    ]
     return StationMeteorologicalReadings(station_id, meteo_data)
